@@ -3,9 +3,10 @@
 import { Sidebar } from "@/components/dash-sidebar";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Button } from '@/components/ui/button';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut, User as UserIcon, Bell, Search, Command } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,6 +16,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Input } from "@/components/ui/input"
 
 export function DashboardLayout({ children, title = "Dashboard" }) {
     const router = useRouter();
@@ -37,12 +39,11 @@ export function DashboardLayout({ children, title = "Dashboard" }) {
     };
 
     return (
-        <div className="flex h-screen bg-slate-50/50 dark:bg-background text-foreground">
+        <div className="flex h-screen overflow-hidden bg-transparent text-foreground font-sans selection:bg-cyan-500/30">
             <Sidebar />
 
             <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
-                {/* Header */}
-                <header className="h-20 border-b border-border bg-card/80 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-30">
+                <header className="h-20 border-b border-white/5 bg-black/20 backdrop-blur-xl flex items-center justify-between px-8 z-10">
                     <div className="flex items-center gap-4">
                         <h2 className="text-2xl font-bold tracking-tight text-foreground font-heading">{title}</h2>
                     </div>

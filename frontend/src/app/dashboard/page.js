@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { NeonButton } from '@/components/ui/neon-button';
+import { HolographicCard } from '@/components/ui/holographic-card';
 import { DashboardLayout } from '@/components/dash-layout';
-import { ArrowUpRight, BookOpen, Mic, User, Linkedin, FileText, Sparkles, Plus, Trophy, Zap, Code2 } from 'lucide-react';
+import { ArrowUpRight, BookOpen, Mic, User, Linkedin, FileText, Sparkles, Plus, Trophy, Zap, Code2, Activity, Cpu, Globe, Rocket, ShieldCheck } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -51,8 +52,8 @@ export default function DashboardPage() {
             setProjects(filtered);
             setStats({
                 projects: filtered.length,
-                certificates: localStorage.getItem('certificates') ? JSON.parse(localStorage.getItem('certificates')).length : 0, // Mock logic if not real
-                interviews: 0 // Placeholder
+                certificates: localStorage.getItem('certificates') ? JSON.parse(localStorage.getItem('certificates')).length : 0, 
+                interviews: 0
             });
         };
         loadRequests();
@@ -60,94 +61,107 @@ export default function DashboardPage() {
 
     if (!user) return null;
 
-    if (!user) return null;
-
     return (
-        <DashboardLayout title="Overview">
-             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <DashboardLayout title="Mission Control">
+             <div className="space-y-8 animate-in fade-in duration-1000">
                  
-                 {/* Hero Section - Vibrant Premium */}
-                 <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 p-8 shadow-xl shadow-indigo-500/20 text-white">
-                     <div className="absolute top-0 right-0 p-8 opacity-20">
-                         <Sparkles className="h-48 w-48 text-white rotate-12" />
+                 {/* Hero Section - Mission Control Header */}
+                 <HolographicCard className="p-8 relative overflow-hidden group">
+                     {/* Dynamic Background */}
+                     <div className="absolute inset-0 bg-gradient-to-r from-cosmic-indigo to-primary/20 opacity-50" />
+                     <div className="absolute top-0 right-0 p-10 opacity-10 animate-[spin-slow_20s_linear_infinite]">
+                         <Rocket className="h-48 w-48 text-plasma-cyan" />
                      </div>
-                     <div className="relative z-10">
-                         <h1 className="text-4xl font-heading font-bold mb-3 tracking-tight">
-                            Welcome back, {user?.name || 'Student'}!
-                         </h1>
-                         <p className="text-indigo-100 max-w-xl mb-8 text-lg font-medium leading-relaxed">
-                            Your learning journey is on track. You have <span className="text-white font-bold">{projects.length} active projects</span> and <span className="text-white font-bold">2 certificates</span> pending.
-                         </p>
+                     
+                     <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                         <div>
+                             <div className="flex items-center gap-3 mb-2">
+                                 <div className="h-3 w-3 rounded-full bg-aurora-green animate-pulse shadow-[0_0_10px_#2DD4BF]" />
+                                 <span className="text-xs font-mono text-plasma-cyan tracking-widest uppercase">Commander On Deck</span>
+                             </div>
+                             <h1 className="text-4xl md:text-5xl font-heading font-bold tracking-tight text-white mb-4">
+                                Welcome, <span className="text-transparent bg-clip-text bg-gradient-to-r from-plasma-cyan to-nebula-purple">{user?.name}</span>
+                             </h1>
+                             <p className="text-slate-300 max-w-xl text-lg leading-relaxed border-l-2 border-plasma-cyan/30 pl-4">
+                                Systems nominal. You have <span className="text-plasma-cyan font-bold">{projects.length} missions</span> active and <span className="text-aurora-green font-bold">2 certifications</span> in orbit.
+                             </p>
+                         </div>
                          <div className="flex gap-4">
-                             <Button size="lg" className="rounded-xl shadow-lg bg-white text-indigo-600 hover:bg-indigo-50 font-bold border-none transition-transform hover:scale-105" onClick={() => router.push('/projects/create')}>
-                                 <Plus className="mr-2 h-5 w-5" /> Generate Project
-                             </Button>
-                             <Button size="lg" variant="outline" className="rounded-xl bg-indigo-700/50 backdrop-blur border-indigo-400/30 text-white hover:bg-indigo-700/70 border-none" onClick={() => router.push('/profile')}>
-                                 View Profile
-                             </Button>
+                             <NeonButton size="lg" variant="primary" onClick={() => router.push('/projects/create')}>
+                                 <Plus className="mr-2 h-5 w-5" /> New Mission
+                             </NeonButton>
+                             <NeonButton size="lg" variant="cyan" onClick={() => router.push('/profile')}>
+                                 <User className="mr-2 h-5 w-5" /> Profile
+                             </NeonButton>
                          </div>
                      </div>
-                 </div>
+                 </HolographicCard>
 
-                 {/* Stats Overview */}
+                 {/* Stats Telemetry */}
                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                     <StatsCard title="Total Projects" value={stats.projects} icon={Code2} color="text-indigo-600" trend="+2 this week" bg="bg-indigo-50 dark:bg-indigo-900/20" />
-                     <StatsCard title="Certificates" value={stats.certificates} icon={Trophy} color="text-amber-500" trend="Verified" bg="bg-amber-50 dark:bg-amber-900/20" />
-                     <StatsCard title="Interview Prep" value={stats.interviews} icon={Mic} color="text-purple-500" trend="0 sessions" bg="bg-purple-50 dark:bg-purple-900/20" />
-                     <StatsCard title="Profile Views" value="128" icon={User} color="text-emerald-500" trend="+12% activity" bg="bg-emerald-50 dark:bg-emerald-900/20" />
+                     <TelemetryCard title="Total Missions" value={stats.projects} icon={Code2} color="text-plasma-cyan" trend="+2 detected" delay={0} />
+                     <TelemetryCard title="Credentials" value={stats.certificates} icon={Trophy} color="text-solar-gold" trend="Verified" delay={0.1} />
+                     <TelemetryCard title="Simulations" value={stats.interviews} icon={Mic} color="text-nebula-purple" trend="0 active" delay={0.2} />
+                     <TelemetryCard title="Profile Vis" value="128" icon={Activity} color="text-aurora-green" trend="+12% activity" delay={0.3} />
                  </div>
 
                 {/* Quick Actions Grid */}
                 <div>
-                    <h2 className="text-xl font-heading font-bold mb-6 flex items-center gap-2 text-foreground">
-                        <Zap className="h-5 w-5 text-amber-500" />
-                        Quick Actions
+                    <h2 className="text-xl font-heading font-bold mb-6 flex items-center gap-2 text-white">
+                        <Zap className="h-5 w-5 text-solar-gold animate-pulse" />
+                        <span className="tracking-wider uppercase">Rapid Deployment</span>
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <ActionCard 
+                        <ActionModule 
                             title="Mock Interview" 
-                            desc="Practice technical & behavioral questions" 
+                            desc="Run technical simulations" 
                             icon={Mic} 
-                            color="bg-purple-100 dark:bg-purple-900/30 text-purple-600"
+                            color="from-nebula-purple/20 to-transparent"
+                            iconColor="text-nebula-purple"
                             onClick={() => router.push('/mock-interview')}
                         />
-                        <ActionCard 
+                        <ActionModule 
                             title="Resume Builder" 
-                            desc="Auto-generate bullet points from projects" 
+                            desc="Compile mission data log" 
                             icon={FileText} 
-                            color="bg-blue-100 dark:bg-blue-900/30 text-blue-600"
+                            color="from-cosmic-indigo/40 to-transparent"
+                            iconColor="text-plasma-cyan"
                             onClick={() => router.push('/resume')}
                         />
-                        <ActionCard 
-                            title="LinkedIn Post" 
-                            desc="Share your achievements with network" 
+                        <ActionModule 
+                            title="Comms Relay" 
+                            desc="Broadcast achievement to network" 
                             icon={Linkedin} 
-                            color="bg-sky-100 dark:bg-sky-900/30 text-sky-600"
+                            color="from-blue-900/40 to-transparent"
+                            iconColor="text-blue-400"
                             onClick={() => router.push('/linkedin/post')}
                         />
                     </div>
                 </div>
 
-                 {/* Recent Projects */}
+                 {/* Recent Missions */}
                  <div>
                      <div className="flex items-center justify-between mb-6">
-                         <h2 className="text-xl font-heading font-bold text-foreground">Recent Projects</h2>
-                         <Button variant="link" className="text-primary font-semibold" onClick={() => router.push('/projects')}>View All</Button>
+                         <h2 className="text-xl font-heading font-bold text-white flex items-center gap-2">
+                             <Globe className="h-5 w-5 text-plasma-cyan" />
+                             <span className="tracking-wider uppercase">Recent Operations</span>
+                         </h2>
+                         <NeonButton variant="ghost" className="text-xs" onClick={() => router.push('/projects')}>View All Logs</NeonButton>
                      </div>
                      
                      {projects.length === 0 ? (
-                         <div className="premium-card py-16 flex flex-col items-center justify-center text-center bg-card">
-                             <div className="p-4 rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
-                                 <BookOpen className="h-8 w-8 text-muted-foreground" />
+                         <HolographicCard className="py-20 flex flex-col items-center justify-center text-center">
+                             <div className="p-6 rounded-full bg-white/5 mb-6 animate-pulse">
+                                 <BookOpen className="h-10 w-10 text-slate-400" />
                              </div>
-                             <h3 className="font-heading font-bold text-lg mb-2">No projects yet</h3>
-                             <p className="text-muted-foreground max-w-sm mb-6">Upload a syllabus to get your first professional project roadmap.</p>
-                             <Button onClick={() => router.push('/projects')}>Create Project</Button>
-                         </div>
+                             <h3 className="font-heading font-bold text-xl text-white mb-2">No active missions</h3>
+                             <p className="text-slate-400 max-w-sm mb-8">Upload syllabus telemetry to generate your first mission roadmap.</p>
+                             <NeonButton variant="cyan" onClick={() => router.push('/projects')}>Initiate Mission</NeonButton>
+                         </HolographicCard>
                      ) : (
                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                              {projects.slice(0, 3).map((project, i) => (
-                                 <ProjectCard key={i} project={project} router={router} />
+                                 <MissionCard key={i} project={project} router={router} index={i} />
                              ))}
                          </div>
                      )}
@@ -157,64 +171,82 @@ export default function DashboardPage() {
     );
 }
 
-function StatsCard({ title, value, icon: Icon, color, trend, bg }) {
+function TelemetryCard({ title, value, icon: Icon, color, trend, delay }) {
     return (
-        <div className="premium-card p-6 bg-card">
-            <div className="flex justify-between items-start mb-4">
-                <div className={`p-3 rounded-xl ${bg}`}>
-                    <Icon className={`h-6 w-6 ${color}`} />
-                </div>
-                 <span className="text-xs font-semibold text-muted-foreground bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full">{trend}</span>
-            </div>
-            <div className="space-y-1">
-                <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
-                <div className="text-3xl font-heading font-bold text-foreground">{value}</div>
-            </div>
-        </div>
-    )
-}
-
-function ActionCard({ title, desc, icon: Icon, color, onClick }) {
-    return (
-        <div className="premium-card p-6 cursor-pointer group bg-card hover:border-primary/50 relative overflow-hidden" onClick={onClick}>
-            <div className="flex items-center gap-5 relative z-10">
-                <div className={`h-14 w-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm ${color}`}>
-                    <Icon className="h-7 w-7" />
-                </div>
-                <div>
-                    <h3 className="font-bold text-foreground text-lg group-hover:text-primary transition-colors">{title}</h3>
-                    <p className="text-sm text-muted-foreground leading-snug mt-1">{desc}</p>
-                </div>
-                <ArrowUpRight className="ml-auto h-5 w-5 text-muted-foreground/30 group-hover:text-primary transition-colors" />
-            </div>
-        </div>
-    )
-}
-
-function ProjectCard({ project, router }) {
-    return (
-         <div 
-            className="premium-card overflow-hidden cursor-pointer group bg-card relative"
-            onClick={() => router.push(`/projects/${project.id}?id=${project.id}&title=${encodeURIComponent(project.title)}&description=${encodeURIComponent(project.description)}&techStack=${encodeURIComponent(Array.isArray(project.techStack) ? project.techStack.join(',') : project.techStack)}`)}
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: delay, duration: 0.5 }}
         >
-            <div className="h-2 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 opacity-80 group-hover:opacity-100 transition-opacity" />
-            <div className="p-6">
-                 <div className="mb-4 flex justify-between items-center">
-                    <span className="text-[10px] font-bold tracking-wider uppercase text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded-md border border-indigo-100 dark:border-indigo-800">
-                        {project.difficulty || 'Intermediate'}
-                    </span>
-                 </div>
-                <h3 className="font-heading font-bold text-lg mb-2 line-clamp-1 group-hover:text-primary transition-colors">{project.title}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-2 h-10 mb-6 leading-relaxed">{project.description}</p>
-                
-                <div className="flex flex-wrap gap-2">
-                    {project.techStack && (Array.isArray(project.techStack) ? project.techStack : project.techStack.split(',')).slice(0, 3).map((t, k) => (
-                        <span key={k} className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded-md font-semibold border border-slate-200 dark:border-slate-700">
-                            {t}
-                        </span>
-                    ))}
+            <HolographicCard className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                    <div className={`p-3 rounded-xl bg-white/5 border border-white/10`}>
+                        <Icon className={`h-6 w-6 ${color} drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]`} />
+                    </div>
+                     <span className="text-[10px] font-mono font-bold text-slate-400 bg-white/5 px-2 py-1 rounded border border-white/5">{trend}</span>
                 </div>
+                <div className="space-y-1">
+                    <h3 className="text-xs font-mono text-slate-400 uppercase tracking-widest">{title}</h3>
+                    <div className="text-3xl font-heading font-bold text-white shadow-black drop-shadow-md">{value}</div>
+                </div>
+            </HolographicCard>
+        </motion.div>
+    )
+}
+
+function ActionModule({ title, desc, icon: Icon, color, iconColor, onClick }) {
+    return (
+        <HolographicCard 
+            className={`p-6 cursor-pointer group hover:border-plasma-cyan/50 bg-gradient-to-br ${color}`} 
+            onClick={onClick}
+        >
+            <div className="flex items-center gap-5 relative z-10">
+                <div className={`h-14 w-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg bg-black/20 border border-white/10`}>
+                    <Icon className={`h-7 w-7 ${iconColor}`} />
+                </div>
+                <div className="flex-1">
+                    <h3 className="font-bold text-white text-lg group-hover:text-plasma-cyan transition-colors font-heading tracking-wide uppercase">{title}</h3>
+                    <p className="text-xs font-mono text-slate-400 mt-1">{desc}</p>
+                </div>
+                <ArrowUpRight className="ml-auto h-5 w-5 text-slate-500 group-hover:text-plasma-cyan transition-colors" />
             </div>
-        </div>
+            
+            {/* Hover Glitch Effect Line */}
+            <div className="absolute bottom-0 left-0 h-1 bg-plasma-cyan/50 w-0 group-hover:w-full transition-all duration-300" />
+        </HolographicCard>
+    )
+}
+
+function MissionCard({ project, router, index }) {
+    return (
+        <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: index * 0.1 }}
+            onClick={() => router.push(`/projects/${project.id}?id=${project.id}&title=${encodeURIComponent(project.title)}&description=${encodeURIComponent(project.description)}&techStack=${encodeURIComponent(Array.isArray(project.techStack) ? project.techStack.join(',') : project.techStack)}`)}
+            className="cursor-pointer"
+        >
+             <HolographicCard className="h-full flex flex-col group p-0">
+                <div className="h-2 w-full bg-gradient-to-r from-cosmic-indigo via-nebula-purple to-plasma-cyan opacity-80 group-hover:opacity-100 transition-opacity" />
+                <div className="p-6 flex flex-col h-full">
+                     <div className="mb-4 flex justify-between items-center">
+                        <span className="text-[10px] font-bold tracking-widest uppercase text-plasma-cyan bg-plasma-cyan/10 px-2 py-1 rounded border border-plasma-cyan/20">
+                            {project.difficulty || 'Intermediate'} Sector
+                        </span>
+                        <Code2 className="h-4 w-4 text-slate-500 group-hover:text-white" />
+                     </div>
+                    <h3 className="font-heading font-bold text-lg mb-2 line-clamp-1 text-white group-hover:text-plasma-cyan transition-colors">{project.title}</h3>
+                    <p className="text-xs text-slate-400 line-clamp-2 h-8 mb-6 leading-relaxed font-mono">{project.description}</p>
+                    
+                    <div className="mt-auto flex flex-wrap gap-2">
+                        {project.techStack && (Array.isArray(project.techStack) ? project.techStack : project.techStack.split(',')).slice(0, 3).map((t, k) => (
+                            <span key={k} className="text-[10px] bg-white/5 text-slate-300 px-2 py-1 rounded font-medium border border-white/5">
+                                {t}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            </HolographicCard>
+        </motion.div>
     )
 }

@@ -74,11 +74,18 @@ router.post('/generate', async (req, res) => {
         const skills = Array.from(skillsSet).slice(0, 15); // Top 15 skills
         const projectTitles = userProjects.map(p => p.project ? p.project.title : "Untitled").slice(0, 5);
 
+        // [NEW] Include Certificates
+        const certificates = await prisma.certificate.findMany({
+            where: { userId }
+        });
+        const certificateTitles = certificates.map(c => c.title);
+
         const userContext = {
             syllabusCount,
             projectCount,
             skills,
-            projectTitles
+            projectTitles,
+            certificateTitles // Pass to AI
         };
 
         // 2. Call AI with Fallback

@@ -81,42 +81,42 @@ class AiService {
         let promptBatch1, promptBatch2;
 
         if (type === "Aptitude") {
-            promptBatch1 = `Generate 10 Aptitude questions (Quantitative & Logical) for a software engineering candidate.
+            promptBatch1 = `Generate 12 mostly asked Aptitude questions (Quantitative & Logical) for a software engineering candidate.
             Focus on: Time & Work, Probability, Data Interpretation, Logical Puzzles.
             Difficulty: ${difficulty}
             Output JSON: { "questions": [...] }`;
 
-            promptBatch2 = `Generate 10 Aptitude questions (Verbal Ability & Reasoning).
+            promptBatch2 = `Generate 12 mostly asked Aptitude questions (Verbal Ability & Reasoning).
             Focus on: Reading Comprehension, Sentence Correction, Critical Reasoning.
             Difficulty: ${difficulty}
             Output JSON: { "questions": [...] }`;
         } else if (type === "DSA") {
-            promptBatch1 = `Generate 10 Data Structures & Algorithms problem statements.
+            promptBatch1 = `Generate 12 mostly asked Data Structures & Algorithms problem statements.
             Topics: Arrays, Strings, Linked Lists, Stacks, Queues.
             Difficulty: ${difficulty}
             Output JSON: { "questions": [...] }`;
 
-            promptBatch2 = `Generate 10 Data Structures & Algorithms problem statements.
+            promptBatch2 = `Generate 12 mostly asked Data Structures & Algorithms problem statements.
             Topics: Trees, Graphs, Recursion, DP.
             Difficulty: ${difficulty}
             Output JSON: { "questions": [...] }`;
         } else if (type === "HR") {
-            promptBatch1 = `Generate 10 common HR Interview questions.
+            promptBatch1 = `Generate 12 mostly asked HR Interview questions.
             Focus on: Self-intro, Strengths/Weaknesses, Career Goals.
             Difficulty: ${difficulty}
             Output JSON: { "questions": [...] }`;
 
-            promptBatch2 = `Generate 10 Behavioral Interview questions.
+            promptBatch2 = `Generate 12 mostly asked Behavioral Interview questions.
             Focus on: Conflict resolution, Teamwork, Leadership, Situational.
             Difficulty: ${difficulty}
             Output JSON: { "questions": [...] }`;
         } else {
             // Default Technical
-            promptBatch1 = `Generate 10 structured interview questions for a Software Engineering candidate focused on "${topic}". Batch 1/2.
+            promptBatch1 = `Generate 12 mostly asked structured interview questions for a Software Engineering candidate focused on "${topic}". Batch 1/2.
             Difficulty: ${difficulty}
             Output JSON: { "questions": [...] }`;
     
-            promptBatch2 = `Generate 10 structured interview questions for a Software Engineering candidate focused on "${topic}". Batch 2/2 (Ensure unique questions).
+            promptBatch2 = `Generate 12 mostly asked structured interview questions for a Software Engineering candidate focused on "${topic}". Batch 2/2 (Ensure unique questions).
             Difficulty: ${difficulty}
             Output JSON: { "questions": [...] }`;
         }
@@ -141,16 +141,16 @@ class AiService {
                 return { id: i + 1, question: qText, type: type };
             });
 
-            // If we have at least 15 questions, return them. 
-            // If we have less (e.g. only 10), trigger fallback to get 15.
-            if (allQuestions.length < 15) throw new Error("Partial generation insufficient");
+            // If we have at least 20 questions, return them. 
+            // If we have less, trigger fallback to get 25.
+            if (allQuestions.length < 20) throw new Error("Partial generation insufficient");
             
             return { questions: allQuestions };
             
         } catch (e) {
             console.error("Parallel Generation Error:", e);
-            // Try single batch fallback of 10 if parallel fails
-            const fallbackPrompt = `Generate 15 ${type} interview questions. Topic: "${topic}". Difficulty: ${difficulty}. Output JSON: { "questions": [...] }`;
+            // Try single batch fallback of 25 if parallel fails
+            const fallbackPrompt = `Generate 25 mostly asked ${type} interview questions. Topic: "${topic}". Difficulty: ${difficulty}. Output JSON: { "questions": [...] }`;
             const fallbackRes = await this.generateJson(fallbackPrompt, "You are a Senior Interviewer.");
              // Ensure consistent format
              const fallbackQuestions = (fallbackRes.questions || []).map((q, i) => ({
@@ -256,6 +256,7 @@ class AiService {
         - Total Projects: ${userContext.projectCount}
         - Top Skills: ${userContext.skills.join(', ')}
         - Recent Project Titles: ${userContext.projectTitles.join(', ')}
+        - Certifications: ${userContext.certificateTitles ? userContext.certificateTitles.join(', ') : "None"}
         
         Requirements:
         1. Bio: A compelling 1st-person professional bio (max 80 words).

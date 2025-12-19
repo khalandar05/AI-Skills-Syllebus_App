@@ -62,6 +62,14 @@ module.exports = {
                     DEFAULT: "hsl(var(--card) / <alpha-value>)",
                     foreground: "hsl(var(--card-foreground) / <alpha-value>)",
                 },
+                // ANTI-GRAVITY SPACE PALETTE
+                "space-black": "#02030A",
+                "cosmic-indigo": "#1B1F3B",
+                "nebula-purple": "#6D28D9",
+                "plasma-cyan": "#22D3EE",
+                "aurora-green": "#2DD4BF",
+                "stellar-pink": "#F472B6",
+                "solar-gold": "#FBBF24",
             },
             borderRadius: {
                 lg: "var(--radius)",
@@ -77,10 +85,25 @@ module.exports = {
                     from: { height: "var(--radix-accordion-content-height)" },
                     to: { height: "0" },
                 },
+                float: {
+                    "0%, 100%": { transform: "translateY(0)" },
+                    "50%": { transform: "translateY(-10px)" },
+                },
+                "pulse-glow": {
+                    "0%, 100%": { opacity: "1", boxShadow: "0 0 20px rgba(79, 70, 229, 0.4)" },
+                    "50%": { opacity: "0.8", boxShadow: "0 0 10px rgba(79, 70, 229, 0.2)" },
+                },
+                "spin-slow": {
+                    from: { transform: "rotate(0deg)" },
+                    to: { transform: "rotate(360deg)" },
+                },
             },
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",
                 "accordion-up": "accordion-up 0.2s ease-out",
+                float: "float 6s ease-in-out infinite",
+                "pulse-glow": "pulse-glow 3s ease-in-out infinite",
+                "spin-slow": "spin-slow 12s linear infinite",
             },
         },
     },

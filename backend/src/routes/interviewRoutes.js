@@ -44,7 +44,17 @@ router.post('/start', async (req, res) => {
                         { id: 7, question: "A shopkeeper sells an article at a loss of 12.5%. Had he sold it for Rs. 51.80 more, he would have earned a profit of 6%. The cost price of the article is?", type: "Aptitude" },
                         { id: 8, question: "Pointing to a photograph, a man said, 'I have no brother or sister but that man’s father is my father’s son.' Whose photograph was it?", type: "Aptitude" },
                         { id: 9, question: "Arrange the words in a meaningful sequence: 1. Infection, 2. Consultation, 3. Doctor, 4. Treatment, 5. Recovery", type: "Aptitude" },
-                        { id: 10, question: "Choose the word which is different from the rest: 1. Curd, 2. Butter, 3. Oil, 4. Cheese", type: "Aptitude" }
+                        { id: 10, question: "Choose the word which is different from the rest: 1. Curd, 2. Butter, 3. Oil, 4. Cheese", type: "Aptitude" },
+                        { id: 11, question: "In a certain code language, 'COMPUTER' is written as 'RFUVQNPC'. How is 'MEDICINE' written in that code?", type: "Aptitude" },
+                        { id: 12, question: "A man walks 5 km toward South and then turns to the right. After walking 3 km he turns to the left and walks 5 km. Now in which direction is he from the starting place?", type: "Aptitude" },
+                        { id: 13, question: "Find the odd one out: 3, 5, 11, 14, 17, 21", type: "Aptitude" },
+                        { id: 14, question: "The average of first 50 natural numbers is?", type: "Aptitude" },
+                        { id: 15, question: "A fruit seller had some apples. He sells 40% apples and still has 420 apples. Originally, he had how many apples?", type: "Aptitude" },
+                        { id: 16, question: "Today is Monday. After 61 days, it will be?", type: "Aptitude" },
+                        { id: 17, question: "Insert the missing number: 7, 26, 63, 124, 215, ?", type: "Aptitude" },
+                        { id: 18, question: "If a person crosses a 600m long street in 5 minutes, what is his speed in km/hr?", type: "Aptitude" },
+                        { id: 19, question: "Which number replaces the question mark? 16, 33, 65, 131, 261, (...) ", type: "Aptitude" },
+                        { id: 20, question: "Look at this series: 2, 1, (1/2), (1/4), ... What number should come next?", type: "Aptitude" }
                     ];
                     break;
                 case "DSA":
@@ -58,7 +68,17 @@ router.post('/start', async (req, res) => {
                         { id: 7, question: "What is the time complexity of QuickSort in the worst case?", type: "DSA" },
                         { id: 8, question: "Detect a cycle in a directed graph.", type: "DSA" },
                         { id: 9, question: "Given an array of integers, find the maximum sum subarray (Kadane's Algorithm).", type: "DSA" },
-                        { id: 10, question: "Explain Dynamic Programming with the Climbing Stairs problem.", type: "DSA" }
+                        { id: 10, question: "Explain Dynamic Programming with the Climbing Stairs problem.", type: "DSA" },
+                        { id: 11, question: "Implement a Binary Search algorithm. What is its time complexity?", type: "DSA" },
+                        { id: 12, question: "Find the lowest common ancestor (LCA) of two nodes in a binary tree.", type: "DSA" },
+                        { id: 13, question: "Explain the difference between BFS and DFS.", type: "DSA" },
+                        { id: 14, question: "Check if two strings are anagrams of each other.", type: "DSA" },
+                        { id: 15, question: "Find the intersection of two linked lists.", type: "DSA" },
+                        { id: 16, question: "Reverse a linked list iteratively and recursively.", type: "DSA" },
+                        { id: 17, question: "Implement a Queue using Stacks.", type: "DSA" },
+                        { id: 18, question: "Find the 'K'th largest element in an array.", type: "DSA" },
+                        { id: 19, question: "Merge two sorted arrays without extra space.", type: "DSA" },
+                        { id: 20, question: "Explain the concept of bit manipulation. How to check if a number is a power of 2?", type: "DSA" }
                     ];
                     break;
                 case "HR":
@@ -72,7 +92,17 @@ router.post('/start', async (req, res) => {
                         { id: 7, question: "How do you handle tight deadlines and pressure?", type: "HR" },
                         { id: 8, question: "What motivates you?", type: "HR" },
                         { id: 9, question: "How do you prioritize your tasks?", type: "HR" },
-                        { id: 10, question: "Do you have any questions for us?", type: "HR" }
+                        { id: 10, question: "Do you have any questions for us?", type: "HR" },
+                        { id: 11, question: "Why should we hire you?", type: "HR" },
+                        { id: 12, question: "Describe a situation where you showed leadership.", type: "HR" },
+                        { id: 13, question: "What are your salary expectations?", type: "HR" },
+                        { id: 14, question: "How do you handle constructive criticism?", type: "HR" },
+                        { id: 15, question: "Tell me about a time you had to learn something quickly.", type: "HR" },
+                        { id: 16, question: "What is your biggest professional achievement?", type: "HR" },
+                        { id: 17, question: "How would your previous manager describe you?", type: "HR" },
+                        { id: 18, question: "Are you willing to relocate or travel?", type: "HR" },
+                        { id: 19, question: "What is your dream job?", type: "HR" },
+                        { id: 20, question: "How do you maintain work-life balance?", type: "HR" }
                     ];
                     break;
                 default: // Technical
@@ -86,7 +116,17 @@ router.post('/start', async (req, res) => {
                         { id: 7, question: "Describe a time you failed and what you learned.", type: "Technical" },
                         { id: 8, question: "What are the trade-offs of Microservices vs Monolith?", type: "Technical" },
                         { id: 9, question: "Explain the concept of RESTful APIs.", type: "Technical" },
-                        { id: 10, question: "Do you have any questions for us?", type: "Technical" }
+                        { id: 10, question: "Do you have any questions for us?", type: "Technical" },
+                        { id: 11, question: "Explain the difference between SQL and NoSQL databases.", type: "Technical" },
+                        { id: 12, question: "What is CI/CD and why is it important?", type: "Technical" },
+                        { id: 13, question: "Explain the concept of Docker and Containerization.", type: "Technical" },
+                        { id: 14, question: "How do you handle errors in your code?", type: "Technical" },
+                        { id: 15, question: "What is Git and can you explain standard Git workflow?", type: "Technical" },
+                        { id: 16, question: "Explain the SOLID principles.", type: "Technical" },
+                        { id: 17, question: "What is the difference between TCP and UDP?", type: "Technical" },
+                        { id: 18, question: "How does the internet work (DNS resolution)?", type: "Technical" },
+                        { id: 19, question: "Explain the difference between a process and a thread.", type: "Technical" },
+                        { id: 20, question: "What are design patterns? name a few references you used.", type: "Technical" }
                     ];
             }
         }
