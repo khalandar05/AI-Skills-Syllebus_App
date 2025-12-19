@@ -1,45 +1,63 @@
-const express = require('express');
+const express = require('express'); // Restart trigger
 const cors = require('cors');
 
 const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 const passport = require('passport');
 app.use(passport.initialize());
 
-const syllabusRoutes = require('./routes/syllabusRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
-const qaRoutes = require('./routes/qaRoutes');
+const interviewRoutes = require('./routes/interviewRoutes');
+const linkedinRoutes = require('./routes/linkedinRoutes');
+const assessmentRoutes = require('./routes/assessmentRoutes');
+const certificateRoutes = require('./routes/certificateRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
+const path = require('path');
 
 const authMiddleware = require('./middleware/authMiddleware');
 
-app.use('/api/syllabus', authMiddleware, syllabusRoutes);
 app.use('/api/projects', authMiddleware, projectRoutes);
 app.use('/api/portfolio', authMiddleware, portfolioRoutes);
 app.use('/api/user', authMiddleware, userRoutes);
-app.use('/api/qa', authMiddleware, qaRoutes);
+app.use('/api/interview', authMiddleware, interviewRoutes);
+app.use('/api/auth/linkedin', linkedinRoutes); 
 app.use('/api/auth', authRoutes);
+app.use('/api/assessment', authMiddleware, assessmentRoutes);
+app.use('/api/certificates', authMiddleware, certificateRoutes);
+app.use('/api/syllabus', authMiddleware, require('./routes/syllabusRoutes'));
+app.use('/api/custom-sections', authMiddleware, require('./routes/customSectionRoutes'));
+app.use('/api/upload', uploadRoutes); // No auth for now or add if needed (upload internal)
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routes Placeholder
 app.get('/', (req, res) => {
-    res.send('Syllabus to Skills API Running');
+    res.send('CareerForge API Running');
 });
 
 // Global Error Handler - LAST Middleware
 app.use((err, req, res, next) => {
-    console.error("🔥 Glober Error Handler Caught:", err);
+    console.error("🔥 Global Error Handler Caught:", err);
     if (res.headersSent) {
         return next(err);
     }
+    
+    // Ensure we always return JSON, even for weird errors
+    const errorMessage = err.message || (typeof err === 'string' ? err : "Unknown Internal Server Error");
+    const errorDetails = process.env.NODE_ENV === 'development' ? err.stack : undefined;
+
     res.status(err.status || 500).json({
         success: false,
-        error: err.message || "Internal Server Error"
+        error: errorMessage,
+        details: errorDetails
     });
 });
 

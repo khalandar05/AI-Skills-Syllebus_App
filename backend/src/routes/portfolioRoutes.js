@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../lib/prisma');
 const aiService = require('../services/aiService');
 
 // Get User Portfolio
@@ -26,6 +25,12 @@ router.post('/generate', async (req, res) => {
     try {
         const userId = req.headers['x-user-id'];
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        // [Fix] Check if user actually exists (Handle stale tokens after DB migration)
+        const userExists = await prisma.user.findUnique({ where: { id: userId } });
+        if (!userExists) {
+            return res.status(401).json({ error: 'User record not found. Please logout and login again.' });
+        }
 
         // 1. Gather Context
         const syllabi = await prisma.syllabus.findMany({
@@ -54,39 +59,64 @@ router.post('/generate', async (req, res) => {
 
         // Add project stacks
         userProjects.forEach(up => {
-            if (up.project.techStack) {
+            if (up.project && up.project.techStack) {
                 up.project.techStack.split(',').forEach(tech => skillsSet.add(tech.trim()));
             }
         });
 
+        // [NEW] Include Manual Profile Skills
+        const existingPortfolio = await prisma.portfolio.findUnique({ where: { userId } });
+        if (existingPortfolio && existingPortfolio.skills) {
+            existingPortfolio.skills.split(',').forEach(s => skillsSet.add(s.trim()));
+            console.log(`[DEBUG] Included manual skills: ${existingPortfolio.skills}`);
+        }
+
         const skills = Array.from(skillsSet).slice(0, 15); // Top 15 skills
+        const projectTitles = userProjects.map(p => p.project ? p.project.title : "Untitled").slice(0, 5);
 
         const userContext = {
             syllabusCount,
             projectCount,
-            skills
+            skills,
+            projectTitles
         };
 
-        // 2. Call AI
+        // 2. Call AI with Fallback
         console.log(`[DEBUG] Generating Portfolio for User ${userId}`);
-        const aiData = await aiService.generatePortfolioContent(userContext);
+        let aiData = {};
+        
+        try {
+            aiData = await aiService.generatePortfolioContent(userContext);
+        } catch (aiError) {
+            console.error("AI Portfolio Gen Failed, using fallback:", aiError.message);
+            // Fallback Generation
+            const topSkills = skills.slice(0, 5).join(', ');
+            const topProject = projectTitles[0] || "Software Engineering";
+            
+            aiData = {
+                bio: `Passionate Software Engineer skilled in ${topSkills}. Recently built projects including ${topProject}.`,
+                summary: `Motivated developer with experience in ${topSkills}. Proven track record of building full-stack applications like ${topProject}.`,
+                jobTitle: "Software Developer",
+                funFact: "I enjoy solving complex technical problems."
+            };
+        }
 
         // 3. Save to DB
         const portfolio = await prisma.portfolio.upsert({
             where: { userId },
             update: {
-                bio: aiData.bio,
-                summary: aiData.summary,
-                jobTitle: aiData.jobTitle,
-                funFact: aiData.funFact,
+                bio: aiData.bio || "Professional Developer",
+                summary: aiData.summary || "Ready to ship code.",
+                jobTitle: aiData.jobTitle || "Software Engineer",
+                funFact: aiData.funFact || "Code is poetry.",
                 skills: skills.join(', ')
             },
             create: {
                 userId,
-                bio: aiData.bio,
-                summary: aiData.summary,
-                jobTitle: aiData.jobTitle,
-                funFact: aiData.funFact,
+                bio: aiData.bio || "Professional Developer",
+                summary: aiData.summary || "Ready to ship code.",
+                jobTitle: aiData.jobTitle || "Software Engineer",
+                funFact: aiData.funFact || "Code is poetry.",
                 skills: skills.join(', ')
             }
         });

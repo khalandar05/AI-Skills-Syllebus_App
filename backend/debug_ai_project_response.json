@@ -1,0 +1,91 @@
+{
+  "units": [
+    {
+      "number": 1,
+      "title": "Introduction to react learning",
+      "topics": [
+        {
+          "name": "Fundamentals & Basics",
+          "subtopics": [
+            "History",
+            "Core Concepts",
+            "Environment Setup"
+          ],
+          "keywords": [
+            "Setup",
+            "Intro",
+            "Basics"
+          ]
+        },
+        {
+          "name": "Key Principles",
+          "subtopics": [
+            "Architecture",
+            "Data Flow",
+            "Components"
+          ],
+          "keywords": [
+            "Architecture",
+            "Design"
+          ]
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Advanced react learning",
+      "topics": [
+        {
+          "name": "Performance & Scaling",
+          "subtopics": [
+            "Optimization Techniques",
+            "Caching",
+            "Load Balancing"
+          ],
+          "keywords": [
+            "Scale",
+            "Performance"
+          ]
+        },
+        {
+          "name": "Security",
+          "subtopics": [
+            "Authentication",
+            "Authorization",
+            "Data Protection"
+          ],
+          "keywords": [
+            "Security",
+            "Auth"
+          ]
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Real-world Applications",
+      "topics": [
+        {
+          "name": "Project Development",
+          "subtopics": [
+            "Planning",
+            "Implementation",
+            "Testing",
+            "Deployment"
+          ],
+          "keywords": [
+            "DevOps",
+            "CI/CD"
+          ]
+        }
+      ]
+    }
+  ],
+  "skills": [
+    "react learning Fundamentals",
+    "System Design",
+    "security",
+    "Performance Optimization",
+    "Full Stack Development"
+  ]
+}

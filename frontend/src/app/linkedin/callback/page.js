@@ -1,0 +1,103 @@
+"use client"
+
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { DashboardLayout } from '@/components/dash-layout';
+import { Loader2, CheckCircle, XCircle } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+
+export default function LinkedInCallbackPage() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const [status, setStatus] = useState('processing'); // processing, success, error
+
+    useEffect(() => {
+        const code = searchParams.get('code');
+        const error = searchParams.get('error');
+
+        if (error) {
+            setStatus('error');
+            return;
+        }
+
+        if (code) {
+            connectLinkedIn(code);
+        } else {
+            setStatus('error');
+        }
+    }, [searchParams]);
+
+    const connectLinkedIn = async (code) => {
+        const token = localStorage.getItem('syllabus_auth_token');
+        if (!token) {
+            router.push('/auth/login');
+            return;
+        }
+
+        try {
+            const res = await fetch('http://localhost:4000/api/auth/linkedin/connect', {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                setStatus('success');
+                setTimeout(() => {
+                    router.push('/linkedin/post');
+                }, 2000);
+            } else {
+                console.error(data.error);
+                setStatus('error');
+            }
+        } catch (err) {
+            console.error(err);
+            setStatus('error');
+        }
+    };
+
+    return (
+        <DashboardLayout title="Connecting LinkedIn...">
+            <div className="flex flex-col h-[60vh] items-center justify-center">
+                <Card className="w-full max-w-md shadow-lg">
+                    <CardContent className="flex flex-col items-center py-10 space-y-4">
+                        {status === 'processing' && (
+                            <>
+                                <Loader2 className="w-12 h-12 text-indigo-600 animate-spin" />
+                                <h2 className="text-xl font-semibold">Connecting to LinkedIn...</h2>
+                                <p className="text-muted-foreground">Please wait while we verify your account.</p>
+                            </>
+                        )}
+                        {status === 'success' && (
+                            <>
+                                <CheckCircle className="w-12 h-12 text-green-500" />
+                                <h2 className="text-xl font-semibold">Connected Successfully!</h2>
+                                <p className="text-muted-foreground">Redirecting you to create a post...</p>
+                            </>
+                        )}
+                        {status === 'error' && (
+                            <>
+                                <XCircle className="w-12 h-12 text-red-500" />
+                                <h2 className="text-xl font-semibold">Connection Failed</h2>
+                                <p className="text-muted-foreground text-center">
+                                    We couldn't connect your LinkedIn account.<br/>
+                                    Please try again.
+                                </p>
+                                <button 
+                                    onClick={() => router.push('/linkedin/post')}
+                                    className="mt-4 text-indigo-600 hover:underline"
+                                >
+                                    Return to Post Page
+                                </button>
+                            </>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
+        </DashboardLayout>
+    );
+}

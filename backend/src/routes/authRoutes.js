@@ -1,7 +1,6 @@
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
 const router = express.Router();
-const prisma = new PrismaClient();
+const prisma = require('../lib/prisma');
 
 const passport = require('passport');
 const GitHubStrategy = require('passport-github2').Strategy;
@@ -11,54 +10,66 @@ const jwt = require('jsonwebtoken');
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser((id, done) => done(null, id));
 
-passport.use(new GitHubStrategy({
-    clientID: process.env.GITHUB_CLIENT_ID,
-    clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: process.env.GITHUB_CALLBACK_URL
-},
-    async (accessToken, refreshToken, profile, done) => {
-        try {
-            const email = profile.emails && profile.emails[0] ? profile.emails[0].value : `${profile.username}@github.com`;
+if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+    passport.use(new GitHubStrategy({
+        clientID: process.env.GITHUB_CLIENT_ID,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        callbackURL: process.env.GITHUB_CALLBACK_URL || "http://localhost:5000/api/auth/callback/github"
+    },
+        async (accessToken, refreshToken, profile, done) => {
+            try {
+                const email = profile.emails && profile.emails[0] ? profile.emails[0].value : `${profile.username}@github.com`;
 
-            // Upsert user
-            let user = await prisma.user.findUnique({ where: { email } });
+                // Upsert user
+                let user = await prisma.user.findUnique({ where: { email } });
 
-            if (!user) {
-                user = await prisma.user.create({
-                    data: {
-                        email,
-                        name: profile.displayName || profile.username,
-                        image: profile.photos && profile.photos[0] ? profile.photos[0].value : null,
-                        password: 'github-oauth-user', // Placeholder
-                        role: 'STUDENT',
-                        accounts: {
-                            create: {
-                                provider: 'github',
-                                providerAccountId: profile.id,
-                                accessToken
+                if (!user) {
+                    user = await prisma.user.create({
+                        data: {
+                            email,
+                            name: profile.displayName || profile.username,
+                            image: profile.photos && profile.photos[0] ? profile.photos[0].value : null,
+                            password: 'github-oauth-user', // Placeholder
+                            role: 'STUDENT',
+                            accounts: {
+                                create: {
+                                    provider: 'github',
+                                    providerAccountId: profile.id,
+                                    accessToken
+                                }
                             }
                         }
-                    }
-                });
-            } else {
-                // Update token if needed
-                // (Simplified for now, assumes user exists)
-            }
+                    });
+                } else {
+                    // Update token if needed
+                }
 
-            return done(null, user);
-        } catch (err) {
-            return done(err);
+                return done(null, user);
+            } catch (err) {
+                return done(err);
+            }
         }
-    }
-));
+    ));
+} else {
+    console.warn("GitHub OAuth skipped: Missing GITHUB_CLIENT_ID/SECRET");
+}
 
 // --- Routes ---
 
 // 1. Trigger GitHub Login
-router.get('/github', passport.authenticate('github', { scope: ['user:email', 'repo'] }));
+router.get('/github', (req, res, next) => {
+    if (!process.env.GITHUB_CLIENT_ID) {
+        return res.status(503).json({ error: "GitHub Login disabled (missing config)" });
+    }
+    passport.authenticate('github', { scope: ['user:email', 'repo'] })(req, res, next);
+});
 
 // 2. Callback
 router.get('/callback/github',
+    (req, res, next) => {
+         if (!process.env.GITHUB_CLIENT_ID) return res.redirect('/login?error=github_disabled');
+         next();
+    },
     passport.authenticate('github', { failureRedirect: '/login?error=github_failed', session: false }),
     (req, res) => {
         // Successful authentication
@@ -88,8 +99,16 @@ router.post('/login', async (req, res) => {
         }
 
         const profilePhoto = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`;
+
+        const token = jwt.sign(
+            { userId: user.id, email: user.email },
+            process.env.JWT_SECRET || 'supersecretkey',
+            { expiresIn: '7d' }
+        );
+
         res.json({
             success: true,
+            token,
             user: {
                 id: user.id,
                 email: user.email,
@@ -107,12 +126,24 @@ router.post('/register', async (req, res) => {
     const { email, password, name } = req.body;
 
     try {
-        const user = await prisma.user.create({
-            data: { email, password, name }
-        });
+        let user = await prisma.user.findUnique({ where: { email } });
+
+        if (!user) {
+            user = await prisma.user.create({
+                data: { email, password, name }
+            });
+        }
+
+        const token = jwt.sign(
+            { userId: user.id, email: user.email },
+            process.env.JWT_SECRET || 'supersecretkey',
+            { expiresIn: '7d' }
+        );
+
         const profilePhoto = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
         res.json({
             success: true,
+            token,
             user: {
                 ...user,
                 profilePhoto

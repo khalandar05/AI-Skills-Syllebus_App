@@ -1,184 +1,279 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const OpenAI = require("openai");
 
 class AiService {
     constructor() {
-        this.apiKey = process.env.GEMINI_API_KEY;
+        this.apiKey = process.env.OPENROUTER_API_KEY;
+        this.baseURL = process.env.OPENROUTER_BASE_URL || "https://openrouter.ai/api/v1";
+        this.model = process.env.AI_MODEL_NAME || "meta-llama/llama-3-70b-instruct";
+
         if (!this.apiKey) {
-            console.error("❌ CRITICAL: GEMINI_API_KEY is missing from .env!");
+            console.error("❌ CRITICAL: OPENROUTER_API_KEY is missing!");
         } else {
-            this.genAI = new GoogleGenerativeAI(this.apiKey);
+            this.openai = new OpenAI({
+                apiKey: this.apiKey,
+                baseURL: this.baseURL,
+                defaultHeaders: {
+                    "HTTP-Referer": "https://antigravity-app.com", // Optional, for OpenRouter rankings
+                    "X-Title": "AntiGravity Portfolio"
+                }
+            });
+            console.log(`✅ AI Service Initialized with Model: ${this.model}`);
         }
     }
 
-    /**
-     * Generic wrapper to call Gemini and return text.
-     */
-    async generateContent(prompt, systemInstruction = "") {
-        if (!this.apiKey) {
-            throw new Error("Gemini API Key is missing. Cannot generate content.");
-        }
+    async generateJson(prompt, systemInstruction) {
+        if (!this.openai) throw new Error("AI Service not initialized");
+
         try {
-            // FORCE gemini-flash-latest (valid handle found in v1beta list)
-            const model = this.genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+            const completion = await this.openai.chat.completions.create({
+                model: this.model,
+                messages: [
+                    { role: "system", content: systemInstruction + " RETURN JSON ONLY." },
+                    { role: "user", content: prompt }
+                ],
+                response_format: { type: "json_object" }
+            });
 
-            // Construct the prompt carefully
-            const fullPrompt = systemInstruction ? `${systemInstruction}\n\n${prompt}` : prompt;
-
-            const result = await model.generateContent(fullPrompt);
-            const response = await result.response;
-            return response.text();
+            const content = completion.choices[0].message.content;
+            return JSON.parse(content);
         } catch (error) {
             console.error("AI Generation Error:", error);
-
-            // Handle Rate Limits gracefully
-            if (error.message.includes('429') || error.message.includes('Quota') || error.message.includes('Too Many Requests')) {
-                throw new Error("AI Usage Limit Reached. Please wait a minute before trying again (Google Free Tier Quota).");
-            }
-
-            // Enhance error message for debugging
-            throw new Error(`AI Service Failed: ${error.message}`);
-        }
-    }
-
-    /**
-     * Robust Helper to clean and parse JSON from AI output.
-     * Retries automatically on failure.
-     */
-    async getValidatedJson(prompt, systemInstruction, retryCount = 1) {
-        for (let attempt = 0; attempt <= retryCount; attempt++) {
+            // Fallback for simple JSON parsing if the model is chatty
             try {
-                const rawText = await this.generateContent(prompt, systemInstruction);
-
-                // Aggressive Cleaning Strategy
-                // 1. Remove Markdown code blocks (```json ... ``` or just ``` ... ```)
-                let cleanText = rawText.replace(/```\w*\n?/g, '').replace(/```/g, '');
-
-                // 2. Find the first '{' and the last '}' 
-                const firstBrace = cleanText.indexOf('{');
-                const lastBrace = cleanText.lastIndexOf('}');
-
-                if (firstBrace === -1 || lastBrace === -1) {
-                    throw new Error("No JSON object found in response (missing braces).");
-                }
-
-                // Extract just the JSON part
-                cleanText = cleanText.substring(firstBrace, lastBrace + 1);
-
-                // 3. Fix common JSON errors from AI (Trailing commas)
-                cleanText = cleanText.replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
-
-                // 4. Fix bad escapes (backslashes that aren't part of valid escapes)
-                // This regex finds \ not followed by ", \, /, b, f, n, r, t, or u
-                cleanText = cleanText.replace(/\\(?!["\\/bfnrtu])/g, "\\\\");
-
-                // 5. Trim whitespace
-                cleanText = cleanText.trim();
-
-                try {
-                    return JSON.parse(cleanText);
-                } catch (parseError) {
-                    console.warn(`[AiService] JSON Parse Error on text:`, cleanText);
-                    throw parseError;
-                }
-
+                const text = error.response?.data?.error?.message || error.message; 
+                 // Naive fallback if we had access to the raw text, but mostly we just throw
+                throw new Error("Failed to generate JSON from AI.");
             } catch (e) {
-                console.warn(`[AiService] Attempt ${attempt + 1} failed:`, e.message);
-                if (attempt === retryCount) throw e; // Fail after all retries
+                throw error;
             }
         }
     }
+
+    async generateResumeBullets(projectTitle, description, techStack) {
+        const prompt = `Generate 4 high-impact, ATS-friendly resume bullet points for a project titled "${projectTitle}".
+        
+        Context:
+        - Description: ${description}
+        - Tech Stack: ${Array.isArray(techStack) ? techStack.join(', ') : techStack}
+        
+        Requirements:
+        - Use action verbs (Architected, Developed, Optimized).
+        - Include metrics if plausible (e.g., "Reduced latency by 20%").
+        - Focus on technical complexity.
+        
+        Output JSON: { "bullets": ["...", "...", "...", "..."] }`;
+
+        try {
+            const res = await this.generateJson(prompt, "You are an expert Resume Writer for Software Engineers.");
+            return res.bullets;
+        } catch (e) {
+            console.warn("AI Resume Gen failed, returning fallback.");
+            return [
+                `Developed ${projectTitle} using ${techStack}, focusing on scalable architecture.`,
+                `Implemented core features to solve key user problems efficiently.`,
+                `Optimized application performance and ensured code maintainability.`,
+                `Collaborated on full-stack development using best practices.`
+            ];
+        }
+    }
+
+    async generateInterviewQuestions(topic, difficulty = "Medium", type = "Technical") {
+        let promptBatch1, promptBatch2;
+
+        if (type === "Aptitude") {
+            promptBatch1 = `Generate 10 Aptitude questions (Quantitative & Logical) for a software engineering candidate.
+            Focus on: Time & Work, Probability, Data Interpretation, Logical Puzzles.
+            Difficulty: ${difficulty}
+            Output JSON: { "questions": [...] }`;
+
+            promptBatch2 = `Generate 10 Aptitude questions (Verbal Ability & Reasoning).
+            Focus on: Reading Comprehension, Sentence Correction, Critical Reasoning.
+            Difficulty: ${difficulty}
+            Output JSON: { "questions": [...] }`;
+        } else if (type === "DSA") {
+            promptBatch1 = `Generate 10 Data Structures & Algorithms problem statements.
+            Topics: Arrays, Strings, Linked Lists, Stacks, Queues.
+            Difficulty: ${difficulty}
+            Output JSON: { "questions": [...] }`;
+
+            promptBatch2 = `Generate 10 Data Structures & Algorithms problem statements.
+            Topics: Trees, Graphs, Recursion, DP.
+            Difficulty: ${difficulty}
+            Output JSON: { "questions": [...] }`;
+        } else if (type === "HR") {
+            promptBatch1 = `Generate 10 common HR Interview questions.
+            Focus on: Self-intro, Strengths/Weaknesses, Career Goals.
+            Difficulty: ${difficulty}
+            Output JSON: { "questions": [...] }`;
+
+            promptBatch2 = `Generate 10 Behavioral Interview questions.
+            Focus on: Conflict resolution, Teamwork, Leadership, Situational.
+            Difficulty: ${difficulty}
+            Output JSON: { "questions": [...] }`;
+        } else {
+            // Default Technical
+            promptBatch1 = `Generate 10 structured interview questions for a Software Engineering candidate focused on "${topic}". Batch 1/2.
+            Difficulty: ${difficulty}
+            Output JSON: { "questions": [...] }`;
+    
+            promptBatch2 = `Generate 10 structured interview questions for a Software Engineering candidate focused on "${topic}". Batch 2/2 (Ensure unique questions).
+            Difficulty: ${difficulty}
+            Output JSON: { "questions": [...] }`;
+        }
+
+        try {
+            const results = await Promise.allSettled([
+                this.generateJson(promptBatch1, "You are a Senior Interviewer (Aptitude/Technical/HR)."),
+                new Promise(resolve => setTimeout(resolve, 1000)).then(() => 
+                    this.generateJson(promptBatch2, "You are a Senior Interviewer (Aptitude/Technical/HR).")
+                )
+            ]);
+
+            const questions1 = results[0].status === 'fulfilled' ? results[0].value.questions || [] : [];
+            const questions2 = results[1].status === 'fulfilled' ? results[1].value.questions || [] : [];
+            
+            if (results[0].status === 'rejected') console.error("Batch 1 Failed:", results[0].reason);
+            if (results[1].status === 'rejected') console.error("Batch 2 Failed:", results[1].reason);
+
+            // Merge and re-index
+            let allQuestions = [...questions1, ...questions2].map((q, i) => {
+                const qText = typeof q === 'object' ? q.question : q;
+                return { id: i + 1, question: qText, type: type };
+            });
+
+            // If we have at least 15 questions, return them. 
+            // If we have less (e.g. only 10), trigger fallback to get 15.
+            if (allQuestions.length < 15) throw new Error("Partial generation insufficient");
+            
+            return { questions: allQuestions };
+            
+        } catch (e) {
+            console.error("Parallel Generation Error:", e);
+            // Try single batch fallback of 10 if parallel fails
+            const fallbackPrompt = `Generate 15 ${type} interview questions. Topic: "${topic}". Difficulty: ${difficulty}. Output JSON: { "questions": [...] }`;
+            const fallbackRes = await this.generateJson(fallbackPrompt, "You are a Senior Interviewer.");
+             // Ensure consistent format
+             const fallbackQuestions = (fallbackRes.questions || []).map((q, i) => ({
+                id: i + 1,
+                question: typeof q === 'object' ? q.question : q,
+                type: type
+            }));
+            return { questions: fallbackQuestions };
+        }
+    }
+
+    async evaluateInterviewAnswer(question, answer) {
+        const prompt = `Evaluate this answer.
+        Question: "${question}"
+        Candidate Answer: "${answer}"
+        
+        Output JSON:
+        {
+            "score": 0-10 (Integer),
+            "feedback": "Constructive feedback...",
+            "improvements": ["Tip 1", "Tip 2"]
+        }`;
+
+        return await this.generateJson(prompt, "You are a Fair Tech Interviewer.");
+    }
+
+    async explainAnswer(question) {
+        const prompt = `Provide a clear, educational explanation for this interview question and a model answer.
+        Question: "${question}"
+        
+        Output JSON:
+        {
+            "explanation": "Brief explanation of the concept...",
+            "modelAnswer": "A strong, professional example answer...",
+            "keyPoints": ["Key point 1", "Key point 2"]
+        }`;
+
+        return await this.generateJson(prompt, "You are a Helpful Technical Mentor.");
+    }
+
+    async enhanceBio(currentBio, skills) {
+        const prompt = `Rewrite this professional bio to be more compelling for LinkedIn/Portfolio.
+        Current: "${currentBio}"
+        Skills: ${skills}
+        
+        Output JSON: { "enhancedBio": "..." }`;
+        
+        try {
+             const res = await this.generateJson(prompt, "Personal Branding Expert.");
+             return res.enhancedBio;
+        } catch (e) {
+            return currentBio;
+        }
+    }
+
 
     async generateProjectIdeas(topic, techStack = []) {
-        const prompt = `You are an expert tech career mentor. 
-        Your goal is to suggest 3 REAL-WORLD, PRACTICAL project ideas based on the topic: "${topic}".
+        const prompt = `Generate 3 professional software engineering project ideas based on the topic: "${topic}".
         
-        Constraints:
-        1. NO CODE generation. Do not write any code.
-        2. Ideas must be suitable for a student portfolio to get hired.
-        3. Roadmap must be a 4-week high-level plan (Week 1 to Week 4).
-        4. Tech stack preference: ${techStack.join(', ')}.
-
-        Output strictly valid JSON with this structure:
-        {
-          "projects": [
-            {
-              "title": "Project Title",
-              "problemStatement": "What real problem does this solve?",
-              "realWorldApplication": "Why is this relevant to the industry?",
-              "description": "Simple, clear description of what to build.",
-              "difficulty": "BEGINNER" | "INTERMEDIATE" | "ADVANCED",
-              "techStack": "List of technologies (e.g. React, Node, etc.)",
-              "roadmap": [
-                 { "task": "Week 1: Setup & Core Structure", "status": "TODO" },
-                 { "task": "Week 2: Core Feature Implementation", "status": "TODO" },
-                 { "task": "Week 3: Improvements & UI Polish", "status": "TODO" },
-                 { "task": "Week 4: Real-world Polish & Deployment", "status": "TODO" }
-              ],
-              "stretchGoals": ["Feature X", "Feature Y"]
-            }
-          ]
-        }`;
-
-        return this.getValidatedJson(prompt, "You are a senior developer mentor. Output strictly valid JSON. NO MARKDOWN.");
-    }
-
-
-
-    async generatePortfolioContent(userContext) {
-        const prompt = `Generate a professional portfolio summary and bio based on the following user context:
-        sdyllabuses uploaded: ${userContext.syllabusCount}
-        skills detected: ${userContext.skills.join(', ')}
-        projects generated: ${userContext.projectCount}
-
-        Output a JSON object with this EXACT structure:
-        {
-            "bio": "A 2-3 sentence professional bio suitable for LinkedIn.",
-            "summary": "A persistent, motivating summary of their learning journey.",
-            "jobTitle": "Suggested Job Title (e.g. Junior Full Stack Developer)",
-            "funFact": "A creative tech-related fun fact based on their stack."
-        }`;
-
-        return this.getValidatedJson(prompt, "You are a career coach. Output strictly valid JSON.");
-    }
-
-    async generateChapterQuestions(text) {
-        // Truncate text if too long
-        const safeText = text.substring(0, 15000);
-
-        // Fix bad JSON escapes (single backslashes) before passing to prompt context if possible, 
-        // but here we are sending text TO AI. The Issue is AI OUTPUT.
-
-        const prompt = `Analyze the following chapter content and generate a comprehensive Q&A set.
+        Tech Stack: ${techStack.join(', ') || "Modern Web Stack"}
         
-        Content: "${safeText}..."
-
         Requirements:
-        1. Generate 10-15 Important Questions.
-        2. Include a mix of: 
-           - Short Answer (Conceptual)
-           - Long Answer (Deep Explanation)
-           - Real-World Application (Scenario based)
-           - Exam-Focused (High probability)
-        3. PROVIDE DETAILED ANSWERS for each question.
-        4. Output strictly valid JSON. Avoid using unescaped backslashes.
+        - Real-world problem solving.
+        - Not a generic "ToDo App".
         
-        Output Strictly Valid JSON:
+        Output JSON:
         {
-            "title": "Chapter Title",
-            "focusTopics": ["Topic 1", "Topic 2"],
-            "questions": [
+            "projects": [
                 {
-                    "id": 1,
-                    "question": "The question text?",
-                    "answer": "The detailed answer.",
-                    "type": "Short Answer" | "Long Answer" | "Real-World" | "Exam-Focused",
-                    "difficulty": "Easy" | "Medium" | "Hard"
+                    "title": "Project Title",
+                    "description": "Short description...",
+                    "difficulty": "Intermediate",
+                    "techStack": "React, Node.js",
+                    "roadmap": [
+                         { "task": "Setup Repo", "status": "TODO" },
+                         { "task": "Implement Auth", "status": "TODO" }
+                    ]
                 }
             ]
         }`;
 
-        return this.getValidatedJson(prompt, "You are an expert examiner. Output strictly valid JSON. Escape all backslashes.");
+        return await this.generateJson(prompt, "You are a Tech Lead.");
+    }
+
+    async generateProjectAssets(projectTitle, description, techStack) {
+         const prompt = `Generate asset content for project "${projectTitle}".
+         Description: ${description}
+         Stack: ${techStack}
+         
+         Output JSON:
+         {
+             "readme": "# ${projectTitle}\\n...",
+             "linkedInPost": "Check out my new project...",
+             "resumeBullets": ["Built X using Y", "Optimized Z"]
+         }`;
+         
+         return await this.generateJson(prompt, "Project Manager.");
+    }
+    async generatePortfolioContent(userContext) {
+        const prompt = `Generate professional portfolio content for a software engineer.
+        
+        Context:
+        - Total Projects: ${userContext.projectCount}
+        - Top Skills: ${userContext.skills.join(', ')}
+        - Recent Project Titles: ${userContext.projectTitles.join(', ')}
+        
+        Requirements:
+        1. Bio: A compelling 1st-person professional bio (max 80 words).
+        2. Summary: A strong 3rd-person professional summary for a resume (max 50 words).
+        3. Job Title: A modern, specific job title based on the skills (e.g., "Full Stack React Developer").
+        4. Fun Fact: A short, professional fun fact relating to coding or tech.
+        
+        Output JSON:
+        {
+            "bio": "...",
+            "summary": "...",
+            "jobTitle": "...",
+            "funFact": "..."
+        }`;
+
+        return await this.generateJson(prompt, "You are a sort-after Tech Recruiter and Resume Expert.");
     }
 }
 
 module.exports = new AiService();
+

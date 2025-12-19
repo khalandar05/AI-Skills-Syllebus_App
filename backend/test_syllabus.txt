@@ -1,0 +1,17 @@
+
+# Introduction to React.js
+
+React is a JavaScript library for building user interfaces. It is maintained by Facebook and a community of individual developers and companies.
+
+## Key Concepts
+
+1. **Components**: React builds interfaces with isolated components.
+2. **Virtual DOM**: React creates an in-memory data structure cache, computes the resulting differences, and then updates the browser's displayed DOM efficiently.
+3. **JSX**: A syntax extension to JavaScript. It is similar to a template language, but it has full power of JavaScript.
+
+## Hooks
+Hooks are functions that let you "hook into" React state and lifecycle features from function components. The most common hooks are `useState` and `useEffect`.
+
+## State vs Props
+- **Props** (short for properties) are read-only components.
+- **State** is an observable object that is to be used to contain data about the component that may change over time.

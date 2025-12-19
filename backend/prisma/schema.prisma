@@ -3,27 +3,57 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  image     String? // Profile photo
-  password  String? // Optional for OAuth users
-  role      String   @default("STUDENT") 
-  
+  id       String  @id @default(uuid())
+  email    String  @unique
+  name     String?
+  image    String? // Profile photo
+  password String? // Optional for OAuth users
+  role     String  @default("STUDENT")
+
   // Relations
-  accounts  Account[]
-  projects  UserProject[]
-  syllabi   Syllabus[]
-  resumes   Resume[]
-  portfolio Portfolio?
-  
+  accounts       Account[]
+  projects       UserProject[]
+  resumes        Resume[]
+  interviews     InterviewSession[]
+  portfolio      Portfolio?
+  certificates   Certificate[]
+  customSections CustomSection[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // LinkedIn Integration
+  linkedinAccessToken  String?
+  linkedinRefreshToken String?
+  linkedinTokenExpiry  BigInt? // Expiry timestamp
+
+  linkedinPosts LinkedinPost[]
+}
+
+model LinkedinPost {
+  id             String  @id @default(uuid())
+  userId         String
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content        String
+  linkedinPostId String?
+
+  publishedAt DateTime @default(now())
+}
+
+model CustomSection {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  content   String // Text content or bullets
+  isVisible Boolean  @default(true)
+  createdAt DateTime @default(now())
 }
 
 // For OAuth tokens (GitHub, etc.)
@@ -31,7 +61,7 @@ model Account {
   id                String  @id @default(uuid())
   userId            String
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  provider          String  // "github", "google"
+  provider          String // "github", "google"
   providerAccountId String
   accessToken       String?
   refreshToken      String?
@@ -41,85 +71,92 @@ model Account {
 }
 
 model Portfolio {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bio       String?
-  summary   String?
-  jobTitle  String?
-  funFact   String?
-  skills    String?  // Stored as comma-separated or JSON
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Syllabus {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  content   String   // Extracted text
-  fileName  String?
-  fileType  String?
-  
-  units     Unit[]
-  createdAt DateTime @default(now())
-}
-
-model Unit {
-  id         String   @id @default(uuid())
-  syllabusId String
-  syllabus   Syllabus @relation(fields: [syllabusId], references: [id], onDelete: Cascade)
-  title      String
-  number     Int
-  topics     Topic[]
-}
-
-model Topic {
-  id        String   @id @default(uuid())
-  unitId    String
-  unit      Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
-  name      String
-  skills    String   // Comma separated
-  projects  Project[]
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio         String?
+  summary     String?
+  jobTitle    String?
+  funFact     String?
+  linkedinUrl String?
+  githubUrl   String?
+  skills      String? // Stored as comma-separated or JSON
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Project {
-  id          String   @id @default(uuid())
-  topicId     String?
-  topic       Topic?   @relation(fields: [topicId], references: [id])
+  id          String  @id @default(uuid())
   title       String
   description String
-  difficulty  String   @default("BEGINNER")
-  techStack   String   // Comma separated or JSON
-  roadmap     String?  // JSON string: [{task: "...", status: "TODO"}]
-  
+  difficulty  String  @default("BEGINNER")
+  techStack   String // Comma separated or JSON
+  roadmap     String? // JSON string: [{task: "...", status: "TODO"}]
+
   userProjects UserProject[]
 }
 
 model UserProject {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  projectId   String
-  project     Project  @relation(fields: [projectId], references: [id])
-  
-  status      String   @default("TODO") // TODO, IN_PROGRESS, COMPLETED
-  repoLink    String?  // Link to GitHub repo
-  repoStats   String?  // JSON: {commits: 12, lastUpdate: "..."}
-  
+  id        String  @id @default(uuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  status    String  @default("TODO") // TODO, IN_PROGRESS, COMPLETED
+  repoLink  String? // Link to GitHub repo
+  repoStats String? // JSON: {commits: 12, lastUpdate: "..."}
+
   // AI Generated Outputs
-  readme      String?
+  readme       String?
   linkedInPost String?
-  
+
+  // User Inputs for Portfolio
+  projectType  String? // Academic / Personal / Internship / Professional
+  liveDemoLink String?
+  keyLearnings String?
+  duration     String?
+
   completedAt DateTime?
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime  @updatedAt
+}
+
+model Certificate {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title         String
+  issuer        String
+  issueDate     DateTime
+  credentialId  String?
+  credentialUrl String?
+  skills        String? // Comma separated
+  type          String // Course / Internship / Workshop / Achievement
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Resume {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  title       String   // e.g. "Frontend Resume"
-  content     String   // Generated Bullet points or full content
-  createdAt   DateTime @default(now())
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String // e.g. "Frontend Resume"
+  content   String // Generated Bullet points or full content
+  createdAt DateTime @default(now())
+}
+
+model InterviewSession {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title     String  @default("Mock Interview")
+  questions String // JSON string: ["Q1", "Q2"]
+  answers   String // JSON string: ["A1", "A2"]
+  feedback  String? // JSON string: { score: 85, strengths: [], improvements: [] }
+  score     Int?
+
+  createdAt DateTime @default(now())
 }

@@ -1,0 +1,566 @@
+DEBUG LOG STARTED
+
+[2025-12-14T13:51:18.825Z] processing 22365_3_Prompt Engineering_v7 (1).pdf (application/pdf)
+Parsed Text Length: 84594
+Preview: 
+
+Prompt  
+Engineering
+Author: Lee Boonstra
+
+Prompt Engineering
+February 20252
+Acknowledgements
+Content contributors
+Michael Sherman
+Yuan Cao
+Erick Armbrust
+Anant Nawalgaria
+Antonio Gulli
+Simone Cammel
+Curators and Editors
+Antonio Gulli
+Anant Nawalgaria
+Grace Mollison 
+Technical Writer
+Joey Haymaker
+Designer
+Michael Lanning 
+
+Introduction 6
+Prompt engineering 7
+LLM output configuration 8
+Output length 8
+Sampling controls 9
+Temperature 9
+Top-K and top-P 10
+Putting it all together 11
+Prompting tec...
+-------------------
+
+[2025-12-14T13:58:22.316Z] processing 22365_3_Prompt Engineering_v7 (1).pdf (application/pdf)
+Parsed Text Length: 84594
+Preview: 
+
+Prompt  
+Engineering
+Author: Lee Boonstra
+
+Prompt Engineering
+February 20252
+Acknowledgements
+Content contributors
+Michael Sherman
+Yuan Cao
+Erick Armbrust
+Anant Nawalgaria
+Antonio Gulli
+Simone Cammel
+Curators and Editors
+Antonio Gulli
+Anant Nawalgaria
+Grace Mollison 
+Technical Writer
+Joey Haymaker
+Designer
+Michael Lanning 
+
+Introduction 6
+Prompt engineering 7
+LLM output configuration 8
+Output length 8
+Sampling controls 9
+Temperature 9
+Top-K and top-P 10
+Putting it all together 11
+Prompting tec...
+-------------------
+
+[2025-12-14T14:01:37.573Z] processing 22365_3_Prompt Engineering_v7 (1).pdf (application/pdf)
+Parsed Text Length: 84594
+Preview: 
+
+Prompt  
+Engineering
+Author: Lee Boonstra
+
+Prompt Engineering
+February 20252
+Acknowledgements
+Content contributors
+Michael Sherman
+Yuan Cao
+Erick Armbrust
+Anant Nawalgaria
+Antonio Gulli
+Simone Cammel
+Curators and Editors
+Antonio Gulli
+Anant Nawalgaria
+Grace Mollison 
+Technical Writer
+Joey Haymaker
+Designer
+Michael Lanning 
+
+Introduction 6
+Prompt engineering 7
+LLM output configuration 8
+Output length 8
+Sampling controls 9
+Temperature 9
+Top-K and top-P 10
+Putting it all together 11
+Prompting tec...
+-------------------
+
+[2025-12-14T14:04:00.577Z] processing 22365_3_Prompt Engineering_v7 (1).pdf (application/pdf)
+Parsed Text Length: 84594
+Preview: 
+
+Prompt  
+Engineering
+Author: Lee Boonstra
+
+Prompt Engineering
+February 20252
+Acknowledgements
+Content contributors
+Michael Sherman
+Yuan Cao
+Erick Armbrust
+Anant Nawalgaria
+Antonio Gulli
+Simone Cammel
+Curators and Editors
+Antonio Gulli
+Anant Nawalgaria
+Grace Mollison 
+Technical Writer
+Joey Haymaker
+Designer
+Michael Lanning 
+
+Introduction 6
+Prompt engineering 7
+LLM output configuration 8
+Output length 8
+Sampling controls 9
+Temperature 9
+Top-K and top-P 10
+Putting it all together 11
+Prompting tec...
+-------------------
+
+[2025-12-14T14:06:05.157Z] processing 22365_3_Prompt Engineering_v7 (1).pdf (application/pdf)
+Parsed Text Length: 84594
+Preview: 
+
+Prompt  
+Engineering
+Author: Lee Boonstra
+
+Prompt Engineering
+February 20252
+Acknowledgements
+Content contributors
+Michael Sherman
+Yuan Cao
+Erick Armbrust
+Anant Nawalgaria
+Antonio Gulli
+Simone Cammel
+Curators and Editors
+Antonio Gulli
+Anant Nawalgaria
+Grace Mollison 
+Technical Writer
+Joey Haymaker
+Designer
+Michael Lanning 
+
+Introduction 6
+Prompt engineering 7
+LLM output configuration 8
+Output length 8
+Sampling controls 9
+Temperature 9
+Top-K and top-P 10
+Putting it all together 11
+Prompting tec...
+-------------------
+
+[2025-12-15T02:06:49.703Z] processing 22365_3_Prompt Engineering_v7 (1).pdf (application/pdf)
+Parsed Text Length: 84594
+Preview: 
+
+Prompt  
+Engineering
+Author: Lee Boonstra
+
+Prompt Engineering
+February 20252
+Acknowledgements
+Content contributors
+Michael Sherman
+Yuan Cao
+Erick Armbrust
+Anant Nawalgaria
+Antonio Gulli
+Simone Cammel
+Curators and Editors
+Antonio Gulli
+Anant Nawalgaria
+Grace Mollison 
+Technical Writer
+Joey Haymaker
+Designer
+Michael Lanning 
+
+Introduction 6
+Prompt engineering 7
+LLM output configuration 8
+Output length 8
+Sampling controls 9
+Temperature 9
+Top-K and top-P 10
+Putting it all together 11
+Prompting tec...
+-------------------
+
+[2025-12-15T02:07:09.630Z] processing Unit_1_OS_Notes (1).pdf (application/pdf)
+Parsed Text Length: 163
+Preview:  [ERROR_SCANNED_PDF] The uploaded PDF appears to be an image or scanned document with no selectable text. Please upload a text-based PDF or use an OCR tool first. ...
+-------------------
+
+[2025-12-15T02:07:29.895Z] processing DOC-20251028-WA0002. (2).pdf (application/pdf)
+Parsed Text Length: 1533
+Preview: 
+
+Jenkins Installation (Windows) 
+ 
+Before Installing Jenkins  
+- Check the Java Version in Command Prompt 
+- Java 11,17,21 is supported 
+ 
+If not installed (Java) 
+- Install Java 11 or Java 17 or Java 21 
+ 
+ 
+Jenkins Download 
+- Download the Jenkins from the below URL  
+- https://www.jenkins.io/download/ 
+ 
+Jenkins Installation 
+- Double-click the downloaded 
+.msi
+ file. 
+Follow the Setup Wizard: 
+● Choose installation folder (default: 
+C:\Program Files\Jenkins
+) 
+● Select Run Jenkins as a Loca...
+-------------------
+
+[2025-12-15T02:09:48.125Z] processing 22365_3_Prompt Engineering_v7 (1).pdf (application/pdf)
+Parsed Text Length: 84594
+Preview: 
+
+Prompt  
+Engineering
+Author: Lee Boonstra
+
+Prompt Engineering
+February 20252
+Acknowledgements
+Content contributors
+Michael Sherman
+Yuan Cao
+Erick Armbrust
+Anant Nawalgaria
+Antonio Gulli
+Simone Cammel
+Curators and Editors
+Antonio Gulli
+Anant Nawalgaria
+Grace Mollison 
+Technical Writer
+Joey Haymaker
+Designer
+Michael Lanning 
+
+Introduction 6
+Prompt engineering 7
+LLM output configuration 8
+Output length 8
+Sampling controls 9
+Temperature 9
+Top-K and top-P 10
+Putting it all together 11
+Prompting tec...
+-------------------
+
+[CHUNK ERROR] Chunk 0: AI Generation Failed after 1 attempts. The model may be hallucinating invalid JSON.
+
+[CHUNK ERROR] Chunk 1: AI Generation Failed after 1 attempts. The model may be hallucinating invalid JSON.
+
+[CHUNK ERROR] Chunk 2: AI Generation Failed after 1 attempts. The model may be hallucinating invalid JSON.
+
+[2025-12-15T02:15:52.976Z] processing 22365_3_Prompt Engineering_v7 (1).pdf (application/pdf)
+Parsed Text Length: 84594
+Preview: 
+
+Prompt  
+Engineering
+Author: Lee Boonstra
+
+Prompt Engineering
+February 20252
+Acknowledgements
+Content contributors
+Michael Sherman
+Yuan Cao
+Erick Armbrust
+Anant Nawalgaria
+Antonio Gulli
+Simone Cammel
+Curators and Editors
+Antonio Gulli
+Anant Nawalgaria
+Grace Mollison 
+Technical Writer
+Joey Haymaker
+Designer
+Michael Lanning 
+
+Introduction 6
+Prompt engineering 7
+LLM output configuration 8
+Output length 8
+Sampling controls 9
+Temperature 9
+Top-K and top-P 10
+Putting it all together 11
+Prompting tec...
+-------------------
+
+[JSON PARSE ERROR] Attempt 0
+PROMPT: You are an ELITE ACADEMIC MENTOR.
+            Task: Generate high-quality flashcards from the provid...
+RAW RESPONSE:
+EMPTY
+-------------------
+
+[CHUNK ERROR] Chunk 0: AI Generation Failed after 1 attempts. The model may be hallucinating invalid JSON.
+
+[JSON PARSE ERROR] Attempt 0
+PROMPT: You are an ELITE ACADEMIC MENTOR.
+            Task: Generate high-quality flashcards from the provid...
+RAW RESPONSE:
+EMPTY
+-------------------
+
+[CHUNK ERROR] Chunk 1: AI Generation Failed after 1 attempts. The model may be hallucinating invalid JSON.
+
+[JSON PARSE ERROR] Attempt 0
+PROMPT: You are an ELITE ACADEMIC MENTOR.
+            Task: Generate high-quality flashcards from the provid...
+RAW RESPONSE:
+EMPTY
+-------------------
+
+[CHUNK ERROR] Chunk 2: AI Generation Failed after 1 attempts. The model may be hallucinating invalid JSON.
+
+[2025-12-15T02:21:11.585Z] processing 22365_3_Prompt Engineering_v7 (1).pdf (application/pdf)
+Parsed Text Length: 84594
+Preview: 
+
+Prompt  
+Engineering
+Author: Lee Boonstra
+
+Prompt Engineering
+February 20252
+Acknowledgements
+Content contributors
+Michael Sherman
+Yuan Cao
+Erick Armbrust
+Anant Nawalgaria
+Antonio Gulli
+Simone Cammel
+Curators and Editors
+Antonio Gulli
+Anant Nawalgaria
+Grace Mollison 
+Technical Writer
+Joey Haymaker
+Designer
+Michael Lanning 
+
+Introduction 6
+Prompt engineering 7
+LLM output configuration 8
+Output length 8
+Sampling controls 9
+Temperature 9
+Top-K and top-P 10
+Putting it all together 11
+Prompting tec...
+-------------------
+
+[AI START] Attempt 0 | Model: gemini-2.5-flash
+
+[2025-12-15T02:24:20.541Z] processing 22365_3_Prompt Engineering_v7 (1).pdf (application/pdf)
+Parsed Text Length: 84594
+Preview: 
+
+Prompt  
+Engineering
+Author: Lee Boonstra
+
+Prompt Engineering
+February 20252
+Acknowledgements
+Content contributors
+Michael Sherman
+Yuan Cao
+Erick Armbrust
+Anant Nawalgaria
+Antonio Gulli
+Simone Cammel
+Curators and Editors
+Antonio Gulli
+Anant Nawalgaria
+Grace Mollison 
+Technical Writer
+Joey Haymaker
+Designer
+Michael Lanning 
+
+Introduction 6
+Prompt engineering 7
+LLM output configuration 8
+Output length 8
+Sampling controls 9
+Temperature 9
+Top-K and top-P 10
+Putting it all together 11
+Prompting tec...
+-------------------
+
+[MODEL CHECK FAIL] gemini-1.5-flash-002: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-pro-002: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-flash: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-pro: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.0-pro: this.withTimeout is not a function
+
+[AI START] Attempt 0 | Model: gemini-1.5-flash
+
+[MODEL CHECK FAIL] gemini-1.5-flash-002: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-pro-002: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-flash: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-pro: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.0-pro: this.withTimeout is not a function
+
+[AI START] Attempt 0 | Model: gemini-1.5-flash
+
+[MODEL CHECK FAIL] gemini-1.5-flash-002: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-pro-002: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-flash: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-pro: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.0-pro: this.withTimeout is not a function
+
+[AI START] Attempt 0 | Model: gemini-1.5-flash
+
+[MODEL CHECK FAIL] gemini-1.5-flash-002: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-pro-002: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-flash: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-pro: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.0-pro: this.withTimeout is not a function
+
+[AI START] Attempt 0 | Model: gemini-1.5-flash
+
+[MODEL CHECK FAIL] gemini-1.5-flash-002: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-pro-002: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-flash: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-pro: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.0-pro: this.withTimeout is not a function
+
+[AI START] Attempt 0 | Model: gemini-1.5-flash
+
+[MODEL CHECK FAIL] gemini-1.5-flash-002: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-pro-002: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-flash: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-pro: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.0-pro: this.withTimeout is not a function
+
+[AI START] Attempt 0 | Model: gemini-1.5-flash
+
+[MODEL CHECK FAIL] gemini-1.5-flash-002: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-pro-002: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-flash: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-pro: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.0-pro: this.withTimeout is not a function
+
+[AI START] Attempt 0 | Model: gemini-1.5-flash
+
+[MODEL CHECK FAIL] gemini-1.5-flash: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.5-pro: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-1.0-pro: this.withTimeout is not a function
+
+[AI START] Attempt 0 | Model: gemini-1.5-flash
+
+[MODEL CHECK FAIL] gemini-1.5-flash: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-pro: this.withTimeout is not a function
+
+[AI START] Attempt 0 | Model: gemini-1.5-flash
+
+[MODEL CHECK FAIL] gemini-1.5-flash: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-pro: this.withTimeout is not a function
+
+[AI START] Attempt 0 | Model: gemini-1.5-flash
+
+[AI START] Attempt 1 | Model: gemini-1.5-flash
+
+[AI START] Attempt 2 | Model: gemini-1.5-flash
+
+[MODEL CHECK FAIL] gemini-1.5-flash: this.withTimeout is not a function
+
+[MODEL CHECK FAIL] gemini-pro: this.withTimeout is not a function
+
+[AI START] Attempt 0 | Model: gemini-1.5-flash
+
+[AI START] Attempt 1 | Model: gemini-1.5-flash

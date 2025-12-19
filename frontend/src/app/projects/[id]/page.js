@@ -1,51 +1,76 @@
 "use client"
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { useState } from 'react';
+import { Card, CardContent, CardTitle, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
-import { CheckCircle2, Github, ArrowLeft, ArrowRight, Copy } from 'lucide-react';
+import { CheckCircle2, Github, ArrowLeft, Copy, Clock, Layers, ShieldAlert, FileText, Activity, Loader2, Sparkles, BrainCircuit } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import confetti from 'canvas-confetti';
+import { DashboardLayout } from '@/components/dash-layout';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function ProjectWorkspace({ params }) {
     const searchParams = useSearchParams();
     const router = useRouter();
 
     // Data from URL
+    const id = searchParams.get('id');
     const title = searchParams.get('title') || 'Project Workspace';
     const description = searchParams.get('description') || '';
     const techStack = searchParams.get('techStack') ? searchParams.get('techStack').split(',') : [];
 
-    // Parse Roadmap from URL (or default)
-    // Parse Roadmap from URL (or default)
-    let initialRoadmap = [
-        { task: "Initialize Project Repo", status: "TODO" },
-        { task: "Setup Development Environment", status: "TODO" },
-        { task: "Implement Core Logic", status: "TODO" }
-    ];
+    // Parse RepoStats (contains "Mentor" data)
+    let repoStats = {};
+    try {
+        const rawStats = searchParams.get('repoStats');
+        if (rawStats) repoStats = JSON.parse(rawStats);
+    } catch (e) {}
 
+    const {
+        architectureOverview,
+        risksChallenges,
+        evaluationCriteria,
+        realWorldApplication,
+        problemStatement,
+        whyThisMatchesTheSyllabus,
+        coreConceptsUsed,
+        expectedLearningOutcomes,
+        projectScope,
+        real_world_scenario,
+        syllabus_topics_used
+    } = repoStats;
+
+    // Parse Roadmap
+    let initialRoadmap = [];
     try {
         const rawRoadmap = searchParams.get('roadmap');
         if (rawRoadmap) {
             const decoded = decodeURIComponent(rawRoadmap);
-            // Check if it looks like JSON array
-            if (decoded.trim().startsWith('[')) {
-                initialRoadmap = JSON.parse(decoded);
-            } else {
-                // If it's just a string, wrap it as a single task
-                initialRoadmap = [{ task: decoded, status: "TODO" }];
+            const parsed = JSON.parse(decoded);
+            // Handle Structure: Array of Weeks
+            if (Array.isArray(parsed)) {
+                if (parsed.length > 0 && parsed[0].week) {
+                     parsed.forEach(week => {
+                         week.tasks.forEach(t => {
+                             initialRoadmap.push({ week: week.week, task: t, status: "TODO" });
+                         });
+                     });
+                } else if (parsed[0].task) {
+                    initialRoadmap = parsed.map(p => ({ ...p, week: 'General' }));
+                }
             }
         }
     } catch (e) {
-        console.error("Failed to parse roadmap:", e);
+        console.error("Roadmap parse error", e);
     }
 
-    const [tasks, setTasks] = useState(initialRoadmap);
+    const [tasks, setTasks] = useState(initialRoadmap.length ? initialRoadmap : [{ task: "Initialize Repo", status: "TODO", week: "Setup" }]);
     const [showCompletion, setShowCompletion] = useState(false);
+    const [copiedField, setCopiedField] = useState(null);
     const [generatedAssets, setGeneratedAssets] = useState(null);
+    const [completing, setCompleting] = useState(false);
 
     const moveTask = (taskIndex, newStatus) => {
         const newTasks = [...tasks];
@@ -53,142 +78,372 @@ export default function ProjectWorkspace({ params }) {
         setTasks(newTasks);
     };
 
-    const handleComplete = () => {
-        confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 }
-        });
-
-        // Mock Generation of Resume/LinkedIn assets
-        setGeneratedAssets({
-            resume: [
-                `Built a ${title} using ${techStack.join(', ')} to solve real-world problems.`,
-                `Implemented scalable architecture handling complex data flows.`,
-                `Optimized performance by 30% using modern best practices.`
-            ],
-            linkedin: `🚀 Just finished building ${title}! \n\nIt was a challenging journey learning ${techStack.join(' and ')}. Check out the code below! #coding #developer #project`,
-            readme: `# ${title}\n\n## Description\n${description}\n\n## Tech Stack\n- ${techStack.join('\n- ')}`
-        });
-
-        setShowCompletion(true);
+    const copyToClipboard = (text, field) => {
+        if (!text) return;
+        navigator.clipboard.writeText(text);
+        setCopiedField(field);
+        setTimeout(() => setCopiedField(null), 2000);
     };
 
-    const TaskCard = ({ task, index }) => (
-        <Card className="mb-2 p-3 bg-white shadow-sm hover:shadow-md cursor-pointer transition-all" onClick={() => {
-            if (task.status === 'TODO') moveTask(index, 'IN_PROGRESS');
-            if (task.status === 'IN_PROGRESS') moveTask(index, 'DONE');
-        }}>
-            <p className="font-medium text-sm">{task.task}</p>
-            <p className="text-xs text-gray-400 mt-2">
-                {task.status === 'TODO' ? 'Click to Start ->' : task.status === 'IN_PROGRESS' ? 'Click to Finish ->' : 'Completed'}
-            </p>
-        </Card>
+    const handleComplete = async () => {
+        setCompleting(true);
+        try {
+            const token = localStorage.getItem('syllabus_auth_token');
+            const res = await fetch(`/api/projects/${id}/assets`, {
+                method: 'POST',
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                setGeneratedAssets(data.assets);
+                setShowCompletion(true);
+                confetti({
+                    particleCount: 150,
+                    spread: 80,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                alert("Failed to finalize: " + data.error);
+            }
+        } catch (e) {
+            alert("Network error");
+        } finally {
+            setCompleting(false);
+        }
+    };
+
+    // VIBGYOR Color Palette
+    const VIBGYOR = [
+        { name: 'violet', bg: 'bg-violet-500', text: 'text-violet-700', border: 'border-violet-500', soft: 'bg-violet-50/50 text-violet-700 dark:text-violet-300' },
+        { name: 'indigo', bg: 'bg-indigo-500', text: 'text-indigo-700', border: 'border-indigo-500', soft: 'bg-indigo-50/50 text-indigo-700 dark:text-indigo-300' },
+        { name: 'blue', bg: 'bg-blue-500', text: 'text-blue-700', border: 'border-blue-500', soft: 'bg-blue-50/50 text-blue-700 dark:text-blue-300' },
+        { name: 'green', bg: 'bg-green-500', text: 'text-green-700', border: 'border-green-500', soft: 'bg-green-50/50 text-green-700 dark:text-green-300' },
+        { name: 'amber', bg: 'bg-amber-500', text: 'text-amber-700', border: 'border-amber-500', soft: 'bg-amber-50/50 text-amber-700 dark:text-amber-300' },
+    ];
+
+    if (!id || id.length < 10) {
+        return (
+            <DashboardLayout title="Error">
+                <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4">
+                    <ShieldAlert className="w-16 h-16 text-yellow-500" />
+                    <h2 className="text-2xl font-bold">Invalid Project Link</h2>
+                    <p className="text-muted-foreground max-w-md">
+                        This project link is outdated (using a numeric ID). 
+                        Please go back to the Dashboard and click the project again to get the correct link.
+                    </p>
+                    <Button onClick={() => router.push('/dashboard')}>Back to Dashboard</Button>
+                </div>
+            </DashboardLayout>
+        );
+    }
+
+    const getWeekColor = (weekStr) => {
+        const num = weekStr.match(/\d+/);
+        const index = num ? (parseInt(num[0]) - 1) % 5 : 0;
+        return VIBGYOR[index] || VIBGYOR[0];
+    };
+
+    const TaskCard = ({ task, index, color }) => (
+        <div 
+            className="group relative glass-card p-4 rounded-xl cursor-pointer hover:border-primary/40 transition-all hover:shadow-md mb-3 overflow-hidden border border-border/40 bg-card/60 backdrop-blur-sm" 
+            onClick={() => {
+                if (task.status === 'TODO') moveTask(index, 'IN_PROGRESS');
+                if (task.status === 'IN_PROGRESS') moveTask(index, 'DONE');
+            }}
+        >
+            <div className={`absolute left-0 top-0 bottom-0 w-1 ${color.bg} opacity-70`} />
+            
+            <div className="pl-3">
+                <div className="flex justify-between items-start gap-2">
+                    <p className="font-medium text-sm text-foreground group-hover:text-primary transition-colors leading-relaxed">
+                        {task.task}
+                    </p>
+                    {task.status === 'DONE' && <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />}
+                </div>
+                <div className="flex justify-between items-center mt-3 h-4">
+                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                        {task.status === 'TODO' ? <>Start Task <ArrowLeft className="w-3 h-3 rotate-180" /></> : task.status === 'IN_PROGRESS' ? <>Mark Done <CheckCircle2 className="w-3 h-3" /></> : <span className="text-emerald-500">Completed</span>}
+                    </p>
+                </div>
+            </div>
+        </div>
     );
 
-    return (
-        <div className="container mx-auto p-10">
-            <Link href="/projects" className="flex items-center text-sm text-gray-500 mb-4 hover:text-blue-600">
-                <ArrowLeft className="w-4 h-4 mr-2" /> Back to Projects
-            </Link>
+    const renderGroupedTasks = (status) => {
+        const filtered = tasks.filter(t => (t.status === status) || (status === 'TODO' && !t.status));
+        if (filtered.length === 0) return <div className="p-8 text-center text-muted-foreground text-sm italic opacity-40">No tasks in this stage</div>;
 
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{title}</h1>
-                    <p className="text-gray-500 max-w-2xl mt-2">{description}</p>
-                    <div className="flex gap-2 mt-4">
-                        {techStack.map(t => (
-                            <Badge key={t} variant="secondary">{t.trim()}</Badge>
+        const groups = filtered.reduce((acc, t) => {
+            const week = t.week || 'Onboarding';
+            if (!acc[week]) acc[week] = [];
+            acc[week].push(t);
+            return acc;
+        }, {});
+
+        return Object.keys(groups).map((week) => {
+            const color = getWeekColor(week);
+            return (
+                <div key={week} className="mb-6 last:mb-2">
+                     <div className={`flex items-center gap-2 px-3 py-1 mb-3 rounded-md w-fit ${color.soft}`}>
+                        <Clock className="w-3.5 h-3.5 opacity-70" /> 
+                        <span className="text-[11px] font-bold uppercase tracking-widest">{week}</span>
+                     </div>
+                     <div className="space-y-1">
+                        {groups[week].map((t) => (
+                             <TaskCard key={tasks.indexOf(t)} task={t} index={tasks.indexOf(t)} color={color} />
                         ))}
+                     </div>
+                </div>
+            );
+        });
+    };
+
+    return (
+        <DashboardLayout title="Workspace">
+            <div className="flex flex-col space-y-6 pb-12 w-full max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-5 duration-700">
+                <Button variant="ghost" onClick={() => router.back()} className="w-fit mb-2 gap-2 text-muted-foreground hover:text-foreground pl-0 group">
+                    <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Back to Projects
+                </Button>
+
+                <div className="flex flex-col lg:flex-row justify-between gap-8 bg-card/40 backdrop-blur-sm p-6 rounded-2xl border border-border/50">
+                    <div className="space-y-4 max-w-3xl">
+                        <div className="space-y-2">
+                             <div className="flex items-center gap-2">
+                                <Badge variant="outline" className="text-primary border-primary/20 bg-primary/5">Enterprise Project</Badge>
+                                <span className="text-xs text-muted-foreground font-mono">ID: {id.slice(0,8)}</span>
+                             </div>
+                             <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">{title}</h1>
+                        </div>
+                        <p className="text-lg text-muted-foreground leading-relaxed">{description}</p>
+                        
+                        <div className="flex flex-wrap gap-2 pt-2">
+                            {techStack.map(t => (
+                                <Badge key={t} variant="secondary" className="px-3 py-1 text-sm bg-secondary/50 hover:bg-secondary/80 font-medium">
+                                    {t.trim()}
+                                </Badge>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-4 min-w-[240px]">
+                         <div className="glass-card p-4 rounded-xl">
+                            <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                                <Activity className="w-4 h-4 text-primary" /> Project Health
+                            </h3>
+                            <div className="space-y-2 text-sm text-muted-foreground">
+                                <div className="flex justify-between text-xs font-medium uppercase tracking-wider">
+                                    <span>Progress</span>
+                                    <span>{Math.round((tasks.filter(t => t.status === 'DONE').length / tasks.length) * 100)}%</span>
+                                </div>
+                                <div className="w-full bg-secondary rounded-full h-2.5 overflow-hidden">
+                                    <div className="bg-gradient-to-r from-primary to-purple-500 h-full transition-all duration-500 shadow-[0_0_10px_rgba(79,70,229,0.3)]" style={{ width: `${(tasks.filter(t => t.status === 'DONE').length / tasks.length) * 100}%` }} />
+                                </div>
+                            </div>
+                         </div>
+
+                        <Button onClick={handleComplete} disabled={completing} className="w-full gap-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white shadow-lg shadow-emerald-500/20 h-10 font-bold tracking-wide transition-all hover:scale-[1.02]">
+                            {completing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                            Finalize Project
+                        </Button>
                     </div>
                 </div>
-                <div className="flex gap-4">
-                    <Button variant="outline">
-                        <Github className="w-4 h-4 mr-2" /> Link Repo
-                    </Button>
-                    <Button onClick={handleComplete} className="bg-green-600 hover:bg-green-700">
-                        <CheckCircle2 className="w-4 h-4 mr-2" /> Mark Complete
-                    </Button>
-                </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[500px]">
-                {/* TODO */}
-                <Card className="bg-gray-50 flex flex-col">
-                    <CardHeader><CardTitle className="text-sm uppercase text-gray-500">To Do</CardTitle></CardHeader>
-                    <CardContent className="flex-1 overflow-auto">
-                        {tasks.filter(t => t.status === 'TODO' || !t.status).map((t, i) => (
-                            <TaskCard key={i} task={t} index={tasks.indexOf(t)} />
-                        ))}
-                    </CardContent>
-                </Card>
+                <Tabs defaultValue="roadmap" className="w-full">
+                    <TabsList className="mb-8 p-1 bg-muted/30 border border-border/40 rounded-lg w-full max-w-3xl grid grid-cols-4">
+                        <TabsTrigger value="roadmap" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Roadmap</TabsTrigger>
+                        <TabsTrigger value="mentorship" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Mentorship</TabsTrigger>
+                        <TabsTrigger value="architecture" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Architecture</TabsTrigger>
+                        <TabsTrigger value="business" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Value</TabsTrigger>
+                    </TabsList>
 
-                {/* IN PROGRESS */}
-                <Card className="bg-blue-50/50 flex flex-col">
-                    <CardHeader><CardTitle className="text-sm uppercase text-blue-500">In Progress</CardTitle></CardHeader>
-                    <CardContent className="flex-1 overflow-auto">
-                        {tasks.filter(t => t.status === 'IN_PROGRESS').map((t, i) => (
-                            <TaskCard key={i} task={t} index={tasks.indexOf(t)} />
-                        ))}
-                        {tasks.filter(t => t.status === 'IN_PROGRESS').length === 0 &&
-                            <p className="text-sm text-gray-400 text-center italic mt-10">Select a task from Todo to start</p>
-                        }
-                    </CardContent>
-                </Card>
-
-                {/* DONE */}
-                <Card className="bg-green-50/50 flex flex-col">
-                    <CardHeader><CardTitle className="text-sm uppercase text-green-600">Done</CardTitle></CardHeader>
-                    <CardContent className="flex-1 overflow-auto">
-                        {tasks.filter(t => t.status === 'DONE').map((t, i) => (
-                            <TaskCard key={i} task={t} index={tasks.indexOf(t)} />
-                        ))}
-                    </CardContent>
-                </Card>
-            </div>
-
-            {/* Completion Modal */}
-            <Dialog open={showCompletion} onOpenChange={setShowCompletion}>
-                <DialogContent className="max-w-3xl">
-                    <DialogHeader>
-                        <DialogTitle>🎉 Project Completed!</DialogTitle>
-                        <DialogDescription>
-                            Great job! Here are your generated assets to showcase your work.
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    {generatedAssets && (
-                        <div className="grid gap-6 py-4">
-                            <div className="space-y-2">
-                                <h3 className="font-semibold text-sm">Resume Bullet Points</h3>
-                                <div className="bg-slate-100 p-4 rounded-md text-sm font-mono relative group">
-                                    <Button size="icon" variant="ghost" className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 h-6 w-6">
-                                        <Copy className="h-3 w-3" />
-                                    </Button>
-                                    <ul className="list-disc pl-4 space-y-1">
-                                        {generatedAssets.resume.map((b, i) => <li key={i}>{b}</li>)}
-                                    </ul>
+                    <TabsContent value="roadmap" className="mt-0 space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                            {/* TODO */}
+                            <div className="flex flex-col bg-muted/20 rounded-2xl border border-dashed border-border/60 min-h-[500px]">
+                                <div className="p-4 flex items-center justify-between border-b border-border/30 bg-muted/10 rounded-t-2xl">
+                                    <h3 className="font-bold text-muted-foreground uppercase text-xs tracking-widest flex items-center gap-2">
+                                        <Layers className="w-4 h-4" /> To Do
+                                    </h3>
+                                    <Badge variant="outline" className="bg-background text-xs font-mono">{tasks.filter(t => t.status === 'TODO' || !t.status).length}</Badge>
+                                </div>
+                                <div className="p-3 h-full overflow-y-auto max-h-[700px] custom-scrollbar">
+                                    {renderGroupedTasks('TODO')}
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <h3 className="font-semibold text-sm">LinkedIn Post</h3>
-                                <div className="bg-slate-100 p-4 rounded-md text-sm whitespace-pre-wrap relative group">
-                                    <Button size="icon" variant="ghost" className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 h-6 w-6">
-                                        <Copy className="h-3 w-3" />
-                                    </Button>
-                                    {generatedAssets.linkedin}
+                            {/* IN PROGRESS */}
+                            <div className="flex flex-col bg-blue-50/20 dark:bg-blue-900/5 rounded-2xl border border-blue-200/30 dark:border-blue-800/20 min-h-[500px]">
+                                <div className="p-4 flex items-center justify-between border-b border-blue-200/30 dark:border-blue-800/20 bg-blue-50/30 dark:bg-blue-900/10 rounded-t-2xl">
+                                    <h3 className="font-bold text-blue-600 dark:text-blue-400 uppercase text-xs tracking-widest flex items-center gap-2">
+                                        <Clock className="w-4 h-4" /> In Progress
+                                    </h3>
+                                    <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-xs font-mono">{tasks.filter(t => t.status === 'IN_PROGRESS').length}</Badge>
+                                </div>
+                                <div className="p-3 h-full overflow-y-auto max-h-[700px] custom-scrollbar">
+                                    {renderGroupedTasks('IN_PROGRESS')}
+                                </div>
+                            </div>
+
+                            {/* DONE */}
+                            <div className="flex flex-col bg-emerald-50/20 dark:bg-emerald-900/5 rounded-2xl border border-emerald-200/30 dark:border-emerald-800/20 min-h-[500px]">
+                                <div className="p-4 flex items-center justify-between border-b border-emerald-200/30 dark:border-emerald-800/20 bg-emerald-50/30 dark:bg-emerald-900/10 rounded-t-2xl">
+                                    <h3 className="font-bold text-emerald-600 dark:text-emerald-400 uppercase text-xs tracking-widest flex items-center gap-2">
+                                        <CheckCircle2 className="w-4 h-4" /> Done
+                                    </h3>
+                                    <Badge variant="secondary" className="bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-mono">{tasks.filter(t => t.status === 'DONE').length}</Badge>
+                                </div>
+                                <div className="p-3 h-full overflow-y-auto max-h-[700px] custom-scrollbar">
+                                    {renderGroupedTasks('DONE')}
                                 </div>
                             </div>
                         </div>
-                    )}
+                    </TabsContent>
 
-                    <DialogFooter>
-                        <Button onClick={() => setShowCompletion(false)}>Close</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                    <TabsContent value="mentorship" className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div className="glass-card rounded-xl p-6 border-l-4 border-l-primary">
+                                <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+                                    <BrainCircuit className="w-5 h-5 text-primary" /> Why this Project?
+                                </h3>
+                                <div className="space-y-6">
+                                    <div>
+                                        <h4 className="font-semibold text-xs uppercase tracking-wide text-muted-foreground mb-2">Real-World Scenario</h4>
+                                        <p className="text-foreground leading-relaxed">{real_world_scenario || whyThisMatchesTheSyllabus || "Aligns with core syllabus topics."}</p>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold text-xs uppercase tracking-wide text-muted-foreground mb-2">Syllabus Grounding</h4>
+                                        <p className="text-sm text-muted-foreground">{syllabus_topics_used ? `Strictly based on: ${syllabus_topics_used.join(', ')}` : (projectScope || description)}</p>
+                                    </div>
+                                </div>
+                            </div>
 
-        </div>
+                            <div className="space-y-6">
+                                <div className="glass-card rounded-xl p-6">
+                                    <h3 className="text-lg font-bold mb-4">Core Concepts</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {coreConceptsUsed && coreConceptsUsed.length > 0 ? (
+                                            coreConceptsUsed.map((c, i) => <Badge key={i} variant="outline" className="px-3 py-1">{c}</Badge>)
+                                        ) : <span className="text-muted-foreground italic">Standard Concepts</span>}
+                                    </div>
+                                </div>
+
+                                <div className="glass-card rounded-xl p-6">
+                                    <h3 className="text-lg font-bold mb-4">Learning Outcomes</h3>
+                                    <ul className="list-disc pl-4 space-y-2 text-sm text-muted-foreground marker:text-primary">
+                                        {expectedLearningOutcomes && expectedLearningOutcomes.length > 0 ? (
+                                            expectedLearningOutcomes.map((l, i) => <li key={i}>{l}</li>)
+                                        ) : <li>Full Stack Proficiency</li>}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </TabsContent>
+
+                    <TabsContent value="architecture" className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div className="glass-card rounded-xl p-6">
+                                <h3 className="text-xl font-bold flex items-center gap-2 mb-4">
+                                    <Layers className="text-primary" /> System Architecture
+                                </h3>
+                                <div className="prose dark:prose-invert text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                                    <p>{architectureOverview || "No detailed architecture provided."}</p>
+                                </div>
+                            </div>
+
+                            <div className="glass-card rounded-xl p-6 border-red-500/20 bg-red-500/5">
+                                <h3 className="text-xl font-bold flex items-center gap-2 mb-4 text-red-600 dark:text-red-400">
+                                    <ShieldAlert /> Risks & Challenges
+                                </h3>
+                                <div className="prose dark:prose-invert text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                                    <p>{risksChallenges || "No risks identified."}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="business" className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+                         <div className="glass-card rounded-xl p-6">
+                            <h3 className="text-xl font-bold mb-6">Evaluation Criteria & Business Value</h3>
+                            <div className="grid gap-8 md:grid-cols-3">
+                                <div>
+                                    <h4 className="font-bold text-primary mb-2">Problem Statement</h4>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">{problemStatement || "N/A"}</p>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-primary mb-2">Real World Application</h4>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">{realWorldApplication || "N/A"}</p>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-primary mb-2">Success Metrics</h4>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">{evaluationCriteria || "N/A"}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </TabsContent>
+                </Tabs>
+
+
+                {/* Completion Modal */}
+                <Dialog open={showCompletion} onOpenChange={setShowCompletion}>
+                    <DialogContent className="max-w-3xl glass-card border-none shadow-2xl">
+                        <DialogHeader>
+                            <DialogTitle className="text-3xl font-bold text-center bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent pb-2">🎉 Project Completed!</DialogTitle>
+                            <DialogDescription className="text-center text-lg">
+                                Excellent work! You've mastered this project. Here are your rewards.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        {generatedAssets && (
+                            <div className="grid gap-6 py-6">
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+                                            <FileText className="w-4 h-4 text-primary" /> Resume Bullet Points
+                                        </h3>
+                                        <Button 
+                                            size="sm" 
+                                            variant="ghost" 
+                                            onClick={() => copyToClipboard(generatedAssets.resumeBullets?.join('\n'), 'resume')}
+                                            className="h-8 text-xs gap-1.5 hover:bg-primary/10 hover:text-primary transition-colors"
+                                        >
+                                            {copiedField === 'resume' ? <><CheckCircle2 className="h-3 w-3 text-green-500" /> Copied</> : <><Copy className="h-3 w-3" /> Copy to Clipboard</>}
+                                        </Button>
+                                    </div>
+                                    <div className="bg-muted/50 p-4 rounded-xl text-sm border border-border/50 text-foreground shadow-inner">
+                                        <ul className="list-disc pl-4 space-y-2">
+                                            {generatedAssets.resumeBullets?.map((b, i) => <li key={i}>{b}</li>) || <li>No bullets generated</li>}
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+                                            <Activity className="w-4 h-4 text-blue-500" /> LinkedIn Post
+                                        </h3>
+                                        <Button 
+                                            size="sm" 
+                                            variant="ghost" 
+                                            onClick={() => copyToClipboard(generatedAssets.linkedInPost, 'linkedin')}
+                                            className="h-8 text-xs gap-1.5 hover:bg-blue-500/10 hover:text-blue-500 transition-colors"
+                                        >
+                                            {copiedField === 'linkedin' ? <><CheckCircle2 className="h-3 w-3 text-green-500" /> Copied</> : <><Copy className="h-3 w-3" /> Copy to Clipboard</>}
+                                        </Button>
+                                    </div>
+                                    <div className="bg-muted/50 p-4 rounded-xl text-sm whitespace-pre-wrap border border-border/50 text-foreground min-h-[100px] shadow-inner font-medium">
+                                        {generatedAssets.linkedInPost || "No post generated"}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <DialogFooter className="sm:justify-center">
+                            <Button onClick={() => setShowCompletion(false)} size="lg" className="px-8 shadow-lg">Close & Continue</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </div>
+        </DashboardLayout>
     );
 }
