@@ -36,7 +36,7 @@ function Fog() {
 export default function SpaceBackground() {
   return (
     <div className="fixed inset-0 -z-50 bg-space-black">
-      <Canvas camera={{ position: [0, 0, 1] }}>
+      <Canvas camera={{ position: [0, 0, 2.5] }}>
         <fog attach="fog" args={['#02030A', 0, 3]} />
         <StarField />
         <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />

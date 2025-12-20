@@ -2,11 +2,10 @@ const express = require('express');
 const router = express.Router();
 const prisma = require('../lib/prisma');
 const axios = require('axios');
+const authMiddleware = require('../middleware/authMiddleware'); // Import Middleware
 
 // Configuration
 const REQUIRED_SCOPES = ['openid', 'profile', 'w_member_social', 'email'];
-// w_member_social is required for posting
-// r_liteprofile and r_emailaddress are legacy, openid and profile/email are OIDC
 
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -17,8 +16,23 @@ router.get('/auth', (req, res) => {
     res.redirect(authorizationUrl);
 });
 
-// 6. Generate AI Post
-router.post('/generate', async (req, res) => {
+// 1.5 Check Connection Status
+router.get('/status', authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user.userId; // Provided by authMiddleware
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        
+        if (user && user.linkedinAccessToken) {
+             return res.json({ connected: true });
+        }
+        return res.json({ connected: false });
+    } catch (e) {
+        return res.json({ connected: false, error: e.message });
+    }
+});
+
+// 6. Generate AI Post (Protected?) - Let's keep it open or protect it. The frontend sends token.
+router.post('/generate', authMiddleware, async (req, res) => {
     try {
         const { topic } = req.body;
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -31,7 +45,6 @@ router.post('/generate', async (req, res) => {
         const result = await model.generateContent(prompt);
         const responseText = result.response.text();
         
-        // Clean markdown code blocks if present
         const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
         const data = JSON.parse(cleanJson);
         
@@ -42,7 +55,7 @@ router.post('/generate', async (req, res) => {
     }
 });
 
-// 2. Callback
+// 2. Callback (Public)
 router.get('/callback', (req, res) => {
     const { code, error } = req.query;
 
@@ -54,32 +67,17 @@ router.get('/callback', (req, res) => {
         return res.redirect(`http://localhost:3000/linkedin/callback?error=no_code`);
     }
 
-    // Redirect to frontend with code so it can call /connect with the user's JWT
     res.redirect(`http://localhost:3000/linkedin/callback?code=${code}`);
 });
 
-// 3. Connect (Authorized endpoint to link account)
-router.post('/connect', async (req, res) => {
-    // Expects Authorization header with JWT
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ error: 'No token provided' });
-    
-    // Validate JWT (Decode logic needs to be shared or imported, for now decoding manually or via middleware if available)
-    // Assuming we don't have global middleware applied here yet, let's verify simply.
-    // Ideally use 'passport' or the existing JWT secret.
-    // I'll grab the `jwt` lib.
-    
-    const jwt = require('jsonwebtoken'); // Lazy load
-    const token = authHeader.split(' ')[1];
-    
+// 3. Connect (Authorized endpoint)
+router.post('/connect', authMiddleware, async (req, res) => {
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'supersecretkey');
-        const userId = decoded.userId;
+        const userId = req.user.userId; // From Middleware
         const { code } = req.body;
 
-        console.log(`[DEBUG] Exchanging code for token. RedirectURI: ${process.env.LINKEDIN_REDIRECT_URI}`);
-        // Exchange code for tokens (Server-side)
-        // Exchange code for tokens (Server-side)
+        console.log(`[DEBUG] Exchanging code for token. User: ${userId}`);
+
         const params = new URLSearchParams();
         params.append('grant_type', 'authorization_code');
         params.append('code', code);
@@ -91,12 +89,9 @@ router.post('/connect', async (req, res) => {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
 
-        console.log('[DEBUG] Token Response:', tokenResponse.data);
-
-        const { access_token, expires_in, refresh_token, refresh_token_expires_in } = tokenResponse.data;
+        const { access_token, expires_in, refresh_token } = tokenResponse.data;
         const expiryDate = Date.now() + (expires_in * 1000);
 
-        // Update User
         await prisma.user.update({
             where: { id: userId },
             data: {
@@ -110,28 +105,22 @@ router.post('/connect', async (req, res) => {
 
     } catch (err) {
         console.error('Connect Error:', err.response?.data || err.message);
-        console.error('Used Redirect URI:', process.env.LINKEDIN_REDIRECT_URI);
-        res.status(500).json({ error: 'Failed to connect LinkedIn Account' });
+        const detailedError = err.response?.data?.error_description || err.message;
+        res.status(500).json({ error: `LinkedIn Error: ${detailedError}` });
     }
 });
 
-// Configure Multer for image uploads
+// Configure Multer
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 
-// 4. Publish Post (Supports Image)
-router.post('/publish', upload.single('image'), async (req, res) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ error: 'No token provided' });
-
-    const jwt = require('jsonwebtoken');
-    const token = authHeader.split(' ')[1];
-
+// 4. Publish Post
+router.post('/publish', authMiddleware, upload.single('image'), async (req, res) => {
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'supersecretkey');
-        const userId = decoded.userId;
+        const userId = req.user.userId;
         const { content } = req.body;
-        const imageFile = req.file; // From multer
+        const imageFile = req.file; 
+
 
         if (!content && !imageFile) return res.status(400).json({ error: 'Content or image is required' });
 
@@ -229,16 +218,11 @@ router.post('/publish', upload.single('image'), async (req, res) => {
 });
 
 // 5. Get History
-router.get('/history', async (req, res) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ error: 'No token provided' });
-    const jwt = require('jsonwebtoken');
-    const token = authHeader.split(' ')[1];
-
+router.get('/history', authMiddleware, async (req, res) => {
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'supersecretkey');
+        const userId = req.user.userId;
         const posts = await prisma.linkedinPost.findMany({
-            where: { userId: decoded.userId },
+            where: { userId },
             orderBy: { publishedAt: 'desc' }
         });
         res.json({ success: true, posts });

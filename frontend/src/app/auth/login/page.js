@@ -19,19 +19,30 @@ export default function LoginPage() {
         setLoading(true);
         setError(null);
 
-        // Simulate API call for demo (replace with actual auth logic)
-        // In a real app, this would hit your backend
         try {
-            // Mock delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            // Mock success
-            localStorage.setItem('user', JSON.stringify({ name: 'Pilot', email: email }));
-            localStorage.setItem('syllabus_auth_token', 'mock_token_xyz');
-            router.push('/dashboard');
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem('syllabus_auth_token', data.token);
+                
+                // Allow time for storage to set before redirect
+                setTimeout(() => {
+                    router.push('/dashboard');
+                }, 100);
+            } else {
+                setError(data.error || 'Authentication Failed. Credentials invalid.');
+            }
             
         } catch (err) {
-            setError('Authentication Failed. Credentials rejected by mainframe.');
+            console.error(err);
+            setError('System Error: Unable to reach authentication server.');
         } finally {
             setLoading(false);
         }

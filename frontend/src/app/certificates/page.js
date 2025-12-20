@@ -28,13 +28,29 @@ export default function CertificatesPage() {
         setLoading(true);
         try {
             const token = localStorage.getItem('syllabus_auth_token');
+            if (!token) {
+                 console.warn("No auth token found, redirecting to login");
+                 // router.push('/auth/login'); // Optional: redirect
+                 return;
+            }
+
             const res = await fetch('/api/certificates', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+            
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`Server returned ${res.status}: ${text}`);
+            }
+
             const data = await res.json();
-            if (data.success) setCertificates(data.certificates);
+            if (data.success) {
+                setCertificates(data.certificates);
+            } else {
+                console.error("API Error:", data.error);
+            }
         } catch (e) {
-            console.error("Failed to load certificates");
+            console.error("Failed to load certificates:", e.message);
         } finally {
             setLoading(false);
         }
@@ -74,6 +90,7 @@ export default function CertificatesPage() {
     
     const handleFileUpload = async (e) => {
         const file = e.target.files?.[0];
+        console.log("File selected:", file);
         if (!file) return;
 
         setUploading(true);
@@ -82,22 +99,30 @@ export default function CertificatesPage() {
 
         try {
             const token = localStorage.getItem('syllabus_auth_token'); 
+            console.log("Uploading file...");
             const res = await fetch('/api/upload', {
                 method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
                 body: formData
             });
             const data = await res.json();
+            console.log("Upload response:", data);
             
             if (data.success) {
                 setFormData(prev => ({ ...prev, credentialUrl: data.url }));
             } else {
+                console.error("Upload failed data:", data);
                 alert("Upload failed: " + (data.error || "Unknown error"));
             }
         } catch (err) {
             console.error("Upload error", err);
-            alert("Upload failed");
+            alert("Upload failed. Check console for details.");
         } finally {
             setUploading(false);
+            // Reset input value to allow re-uploading same file if needed
+            e.target.value = '';
         }
     };
 
@@ -182,15 +207,15 @@ export default function CertificatesPage() {
                                                 placeholder="https://..." 
                                                 className="flex-1 bg-background/50 border-border/60 focus:bg-background"
                                             />
-                                            <div className="relative">
+                                            <div className="relative w-10 h-10">
                                                 <Input 
                                                     type="file" 
                                                     accept="image/*,application/pdf"
                                                     onChange={handleFileUpload}
-                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                    className="absolute inset-0 w-full h-full opacity-0 z-50 cursor-pointer"
                                                     disabled={uploading}
                                                 />
-                                                <Button variant="outline" size="icon" type="button" disabled={uploading} className="bg-background/50 border-dashed border-border hover:border-primary hover:text-primary">
+                                                <Button variant="outline" size="icon" type="button" disabled={uploading} className="w-full h-full bg-background/50 border-dashed border-border hover:border-primary hover:text-primary pointer-events-none">
                                                     {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                                                 </Button>
                                             </div>

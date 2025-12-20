@@ -122,7 +122,7 @@ export default function CreateProjectPage() {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-4xl font-heading font-bold tracking-tight text-white uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">New Mission Protocol</h1>
-                        <p className="text-slate-400 mt-2 text-lg">Generate AI-powered specifications tailored to your trajectory.</p>
+                        <p className="text-slate-400 mt-2 text-lg">Give idea for implenting project i will give you the guidance of it</p>
                     </div>
                 </div>
 
@@ -194,7 +194,7 @@ export default function CreateProjectPage() {
                                             </div>
                                             <h3 className="font-heading font-bold text-xl text-white uppercase tracking-wider">Awaiting Input</h3>
                                             <p className="text-slate-400 max-w-xs mt-2 leading-relaxed font-mono text-sm">
-                                                Enter mission parameters to generate syllabus-aligned project roadmaps.
+                                                Enter mission parameters to generate skill-aligned project roadmaps.
                                             </p>
                                         </motion.div>
                                     )}

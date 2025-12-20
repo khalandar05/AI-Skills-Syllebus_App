@@ -96,6 +96,11 @@ export default function ResumePage() {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
+            if (res.status === 401 || res.status === 403) {
+                 setError('Session Expired: Please Login Again');
+                 return;
+            }
+
             if (!res.ok) {
                 let errorMsg = "Generation Failed";
                 try {
@@ -117,48 +122,67 @@ export default function ResumePage() {
     };
 
     const handleAddSection = async () => {
-        const token = localStorage.getItem('syllabus_auth_token');
+        if (!newSection.title || !newSection.content) return;
+        
         try {
-             const res = await fetch('/api/custom-sections', {
+            const token = localStorage.getItem('syllabus_auth_token');
+            const res = await fetch('/api/custom-sections', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
                 body: JSON.stringify(newSection)
             });
+
             if (res.ok) {
-                fetchCustomSections();
-                setIsSectionDialogOpen(false);
+                await fetchCustomSections();
                 setNewSection({ title: '', content: '' });
+                setIsSectionDialogOpen(false);
             }
-        } catch(e) { console.error(e) }
+        } catch (e) {
+            console.error("Add Section Failed", e);
+        }
     };
 
     const handleDeleteSection = async (id) => {
-        const token = localStorage.getItem('syllabus_auth_token');
+        if (!confirm("Delete this section?")) return;
         try {
-             await fetch(`/api/custom-sections/${id}`, {
+            const token = localStorage.getItem('syllabus_auth_token');
+            const res = await fetch(`/api/custom-sections/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            fetchCustomSections();
-        } catch(e) { console.error(e) }
+            if (res.ok) {
+                setCustomSections(prev => prev.filter(s => s.id !== id));
+            }
+        } catch (e) {
+            console.error("Delete Section Failed", e);
+        }
     };
 
     const copySummary = () => {
-        if (portfolio?.summary) {
-            navigator.clipboard.writeText(portfolio.summary);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        }
+        if (!portfolio?.summary) return;
+        navigator.clipboard.writeText(portfolio.summary);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
     };
 
     if (!user) return null;
 
     return (
-        <DashboardLayout title="Dossier Generator">
+        <DashboardLayout title="Resume Builder">
             <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-1000">
                 {error && (
-                    <div className="p-4 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg flex items-center gap-2">
-                        <span className="font-bold">Error:</span> {error}
+                    <div className="p-4 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg flex flex-col items-start gap-2">
+                        <div className="flex items-center gap-2">
+                             <span className="font-bold">Error:</span> {error}
+                        </div>
+                        {(error.includes('Session') || error.includes('401') || error.includes('403')) && (
+                             <NeonButton onClick={() => router.push('/auth/login')} variant="ghost" className="text-xs h-8">
+                                 Login Again
+                             </NeonButton>
+                        )}
                     </div>
                 )}
 
@@ -168,18 +192,18 @@ export default function ResumePage() {
                             <div className="absolute inset-0 bg-plasma-cyan/20 blur-xl rounded-full animate-pulse" />
                             <FileText className="h-20 w-20 text-plasma-cyan relative z-10" />
                         </div>
-                        <h3 className="text-3xl font-heading font-bold mb-3 text-white uppercase tracking-widest">Dossier Compilation Required</h3>
+                        <h3 className="text-3xl font-heading font-bold mb-3 text-white uppercase tracking-widest">Resume Not Generated</h3>
                         <p className="text-slate-400 max-w-md mx-auto mb-8 text-lg font-light leading-relaxed">
-                            Initialize AI protocols to compile personnel data into a standardized resume format.
+                            Use AI to compile your profile, skills, and projects into a professional resume.
                         </p>
                         <NeonButton onClick={handleGenerate} disabled={loading} size="lg">
                             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                            {loading ? 'Compiling Data...' : 'Build Dossier'}
+                            {loading ? 'Generating...' : 'Generate Resume'}
                         </NeonButton>
                     </HolographicCard>
                 ) : (
                     <div className="grid gap-8">
-                        {/* Dossier Header */}
+                        {/* Resume Header */}
                         <HolographicCard className="p-0 overflow-hidden group">
                             <div className="px-8 py-8 flex flex-col md:flex-row items-center gap-8 bg-black/40">
                                 <div className="h-32 w-32 relative rounded-full border-4 border-plasma-cyan shadow-[0_0_20px_rgba(34,211,238,0.3)] overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-500">
@@ -191,23 +215,23 @@ export default function ResumePage() {
                                 </div>
                                 <div className="flex-1 text-center md:text-left space-y-2">
                                     <h2 className="text-4xl font-heading font-black tracking-wider text-white uppercase">{user.name}</h2>
-                                    <p className="text-xl text-plasma-cyan font-mono tracking-widest uppercase">{portfolio.jobTitle || "Personnel"}</p>
+                                    <p className="text-xl text-plasma-cyan font-mono tracking-widest uppercase">{portfolio.jobTitle || "Job Title"}</p>
                                 </div>
 
                                 <div className="flex gap-4">
                                     <NeonButton onClick={handleGenerate} variant="ghost" disabled={loading} className="text-xs">
                                         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
-                                        Re-Compile
+                                        Regenerate
                                     </NeonButton>
                                     
                                     <Dialog>
                                         <DialogTrigger asChild>
                                             <NeonButton variant="primary">
-                                                <Printer className="mr-2 h-4 w-4" /> Print Dossier
+                                                <Printer className="mr-2 h-4 w-4" /> Print Resume
                                             </NeonButton>
                                         </DialogTrigger>
                                         <DialogContent className="max-w-4xl h-[90vh] overflow-y-auto bg-white text-slate-900 p-0 sm:rounded-none md:rounded-lg border-none">
-                                            <DialogTitle className="sr-only">Dossier Preview</DialogTitle>
+                                            <DialogTitle className="sr-only">Resume Preview</DialogTitle>
                                                 <ResumePreview user={user} portfolio={portfolio} projects={projects} customSections={customSections} />
                                         </DialogContent>
                                     </Dialog>
@@ -220,25 +244,28 @@ export default function ResumePage() {
                             <div className="space-y-6">
                                 <HolographicCard className="p-6">
                                     <div className="flex items-center gap-2 mb-4 text-plasma-cyan uppercase tracking-widest font-bold text-xs">
-                                        <Code2 className="h-4 w-4" /> Skill Matrix
+                                        <Code2 className="h-4 w-4" /> Skills
                                     </div>
+                                    <p className="text-xs text-slate-500 mb-2">
+                                        Derived from your projects and syllabus uploads.
+                                    </p>
                                     <div className="flex flex-wrap gap-2">
                                         {portfolio.skills?.split(',').map((skill, i) => (
                                             <span key={i} className="px-2 py-1 bg-white/5 border border-white/10 text-slate-300 text-xs rounded hover:border-plasma-cyan transition-colors cursor-default">
                                                 {skill.trim()}
                                             </span>
-                                        )) || <span className="text-slate-500 text-sm">No capabilities logged.</span>}
+                                        )) || <span className="text-slate-500 text-sm">No skills found.</span>}
                                     </div>
                                 </HolographicCard>
 
                                 <HolographicCard className="p-6">
                                     <div className="flex items-center gap-2 mb-4 text-white uppercase tracking-widest font-bold text-xs">
-                                        <Share2 className="h-4 w-4" /> Comms
+                                        <Share2 className="h-4 w-4" /> Contact
                                     </div>
                                     <div className="p-3 rounded bg-white/5 border border-white/5 flex items-center gap-3">
                                         <div className="h-8 w-8 rounded-full bg-plasma-cyan/20 flex items-center justify-center text-plasma-cyan font-bold">@</div>
                                         <div className="overflow-hidden">
-                                            <p className="text-[10px] text-slate-500 uppercase font-bold">Subspace ID</p>
+                                            <p className="text-[10px] text-slate-500 uppercase font-bold">Email</p>
                                             <p className="text-sm text-white truncate font-mono">{user.email}</p>
                                         </div>
                                     </div>
@@ -248,7 +275,7 @@ export default function ResumePage() {
                                 <HolographicCard className="p-6">
                                     <div className="flex flex-row items-center justify-between mb-4">
                                         <div className="flex items-center gap-2 text-solar-gold uppercase tracking-widest font-bold text-xs">
-                                            <Plus className="h-4 w-4" /> Append Data
+                                            <Plus className="h-4 w-4" /> Add Section
                                         </div>
                                         <Dialog open={isSectionDialogOpen} onOpenChange={setIsSectionDialogOpen}>
                                             <DialogTrigger asChild>
@@ -257,34 +284,34 @@ export default function ResumePage() {
                                                 </button>
                                             </DialogTrigger>
                                             <DialogContent className="bg-black/90 border-white/20 text-white backdrop-blur-md">
-                                                <DialogTitle className="uppercase tracking-widest text-solar-gold">Append Record</DialogTitle>
+                                                <DialogTitle className="uppercase tracking-widest text-solar-gold">Add Custom Section</DialogTitle>
                                                 <div className="space-y-4 py-4">
                                                     <div className="space-y-2">
-                                                        <label className="text-xs font-bold uppercase tracking-wide text-slate-500">Type / Title</label>
+                                                        <label className="text-xs font-bold uppercase tracking-wide text-slate-500">Title</label>
                                                         <input 
                                                             className="w-full p-3 bg-white/5 border border-white/10 rounded focus:border-solar-gold outline-none text-white" 
-                                                            placeholder="e.g. Clearance Levels"
+                                                            placeholder="e.g. Certifications"
                                                             value={newSection.title}
                                                             onChange={e => setNewSection({...newSection, title: e.target.value})}
                                                         />
                                                     </div>
                                                     <div className="space-y-2">
-                                                        <label className="text-xs font-bold uppercase tracking-wide text-slate-500">Data Content</label>
+                                                        <label className="text-xs font-bold uppercase tracking-wide text-slate-500">Content</label>
                                                         <textarea 
                                                             className="w-full p-3 bg-white/5 border border-white/10 rounded focus:border-solar-gold outline-none text-white min-h-[120px]" 
-                                                            placeholder="Enter record details..."
+                                                            placeholder="Enter details..."
                                                             value={newSection.content}
                                                             onChange={e => setNewSection({...newSection, content: e.target.value})}
                                                         />
                                                     </div>
-                                                    <NeonButton onClick={handleAddSection} className="w-full">Confirm Append</NeonButton>
+                                                    <NeonButton onClick={handleAddSection} className="w-full">Add Section</NeonButton>
                                                 </div>
                                             </DialogContent>
                                         </Dialog>
                                     </div>
                                     
                                     <div className="space-y-3">
-                                        {customSections.length === 0 && <p className="text-xs text-slate-500 italic text-center py-4 border border-dashed border-white/10 rounded">No auxiliary data appended.</p>}
+                                        {customSections.length === 0 && <p className="text-xs text-slate-500 italic text-center py-4 border border-dashed border-white/10 rounded">No custom sections.</p>}
                                         {customSections.map(section => (
                                             <div key={section.id} className="group flex justify-between items-start p-3 bg-white/5 hover:bg-white/10 rounded transition-colors text-sm border border-transparent hover:border-solar-gold/30">
                                                 <div>
@@ -305,10 +332,10 @@ export default function ResumePage() {
                                 <HolographicCard className="p-8">
                                     <div className="flex flex-row items-center justify-between mb-6 pb-4 border-b border-white/10">
                                             <h3 className="text-lg font-heading font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                                                <ScanLine className="h-5 w-5 text-plasma-cyan" /> Executive Summary
+                                                <ScanLine className="h-5 w-5 text-plasma-cyan" /> Professional Summary
                                             </h3>
                                             <NeonButton variant="ghost" size="sm" onClick={copySummary} className="h-8 text-[10px]">
-                                                {copied ? <><CheckCircle2 className="w-3 h-3 mr-1" /> Copied</> : <><Copy className="w-3 h-3 mr-1" /> Copy Data</>}
+                                                {copied ? <><CheckCircle2 className="w-3 h-3 mr-1" /> Copied</> : <><Copy className="w-3 h-3 mr-1" /> Copy Text</>}
                                             </NeonButton>
                                     </div>
                                     <p className="text-slate-300 leading-relaxed font-light text-sm md:text-base border-l-2 border-plasma-cyan/30 pl-4">
@@ -319,7 +346,7 @@ export default function ResumePage() {
                                 <HolographicCard className="p-8">
                                     <div className="mb-6 pb-4 border-b border-white/10">
                                         <h3 className="text-lg font-heading font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                                            <UserIcon className="h-5 w-5 text-nebula-purple" /> Bio-Narrative
+                                            <UserIcon className="h-5 w-5 text-nebula-purple" /> Biography
                                         </h3>
                                     </div>
                                     <div className="bg-nebula-purple/5 p-6 rounded border border-nebula-purple/20 italic text-slate-400 leading-relaxed font-mono text-sm relative">
@@ -354,7 +381,7 @@ function ResumePreview({ user, portfolio, projects, customSections }) {
                     </div>
                     <div className="text-right text-sm text-slate-600 font-mono space-y-1">
                         <p className="font-bold text-slate-900">{user.email}</p>
-                        <p>{user.location || "Remote / Earth"}</p>
+                        <p>{user.location || "Remote"}</p>
                     </div>
                 </div>
             </div>
@@ -362,7 +389,7 @@ function ResumePreview({ user, portfolio, projects, customSections }) {
             {/* Summary */}
             <div className="mb-10">
                 <h2 className="text-xs font-black uppercase border-b border-slate-200 mb-4 text-slate-400 tracking-[0.2em] flex items-center gap-2">
-                    Profile
+                    Professional Profile
                 </h2>
                 <p className="text-slate-700 leading-loose text-sm text-justify font-medium">{portfolio.summary}</p>
             </div>
@@ -370,7 +397,7 @@ function ResumePreview({ user, portfolio, projects, customSections }) {
             {/* Skills */}
             <div className="mb-10">
                 <h2 className="text-xs font-black uppercase border-b border-slate-200 mb-4 text-slate-400 tracking-[0.2em] flex items-center gap-2">
-                    Technical Capabilities
+                    Technical Skills
                 </h2>
                 <div className="w-full">
                     <p className="leading-loose text-sm text-slate-800 font-bold">{portfolio.skills}</p>
@@ -380,7 +407,7 @@ function ResumePreview({ user, portfolio, projects, customSections }) {
             {/* Projects */}
             <div className="mb-10">
                 <h2 className="text-xs font-black uppercase border-b border-slate-200 mb-6 text-slate-400 tracking-[0.2em] flex items-center gap-2">
-                    Project History
+                    Projects
                 </h2>
                 <div className="grid gap-8">
                     {projects.slice(0, 4).map((p, i) => (
@@ -412,7 +439,7 @@ function ResumePreview({ user, portfolio, projects, customSections }) {
 
             <div className="mt-20 pt-8 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-300 font-mono uppercase tracking-widest">
                 <span>Generated via CareerForge</span>
-                <span>Classified Personnel Record</span>
+                <span>Confidential</span>
             </div>
             
 

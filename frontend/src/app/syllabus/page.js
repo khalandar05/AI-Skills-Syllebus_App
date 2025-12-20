@@ -38,7 +38,7 @@ export default function SyllabusUploadPage() {
 
         setUploading(true);
         setProgress(10);
-        setStatusText('Analyzing syllabus structure...');
+        setStatusText('Analyzing course structure...');
         setError(null);
 
         try {
@@ -126,15 +126,15 @@ export default function SyllabusUploadPage() {
     };
 
     return (
-        <DashboardLayout title="Import Syllabus">
+        <DashboardLayout title="Import Course Material">
             <div className="max-w-5xl mx-auto py-12 animate-in fade-in slide-in-from-bottom-5 duration-700">
                 <div className="text-center mb-12 space-y-4">
                     <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mb-2 border border-primary/20 shadow-lg shadow-primary/10">
                         <BookOpen className="h-8 w-8 text-primary" />
                     </div>
-                    <h1 className="text-5xl font-heading font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">Syllabus to Mastery</h1>
+                    <h1 className="text-5xl font-heading font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">Skill Analysis</h1>
                     <p className="text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
-                        Upload your course syllabus to generate a comprehensive Active Recall Deck covering every unit and topic.
+                        Upload your course material to generate a comprehensive Active Recall Deck covering every unit and topic.
                     </p>
                 </div>
 
@@ -183,7 +183,7 @@ export default function SyllabusUploadPage() {
 
                             <TabsContent value="text" className="space-y-6 mt-0 outline-none">
                                 <Textarea
-                                    placeholder="Paste syllabus content, learning objectives, or topic list here..."
+                                    placeholder="Paste course content, learning objectives, or topic list here..."
                                     value={rawText}
                                     onChange={(e) => setRawText(e.target.value)}
                                     rows={12}

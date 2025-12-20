@@ -84,41 +84,41 @@ class AiService {
             promptBatch1 = `Generate 12 mostly asked Aptitude questions (Quantitative & Logical) for a software engineering candidate.
             Focus on: Time & Work, Probability, Data Interpretation, Logical Puzzles.
             Difficulty: ${difficulty}
-            Output JSON: { "questions": [...] }`;
+            Output JSON: { "questions": ["Question 1 text", ...] }`;
 
             promptBatch2 = `Generate 12 mostly asked Aptitude questions (Verbal Ability & Reasoning).
             Focus on: Reading Comprehension, Sentence Correction, Critical Reasoning.
             Difficulty: ${difficulty}
-            Output JSON: { "questions": [...] }`;
+            Output JSON: { "questions": ["Question 1 text", ...] }`;
         } else if (type === "DSA") {
             promptBatch1 = `Generate 12 mostly asked Data Structures & Algorithms problem statements.
             Topics: Arrays, Strings, Linked Lists, Stacks, Queues.
             Difficulty: ${difficulty}
-            Output JSON: { "questions": [...] }`;
+            Output JSON: { "questions": ["Question 1 text", ...] }`;
 
             promptBatch2 = `Generate 12 mostly asked Data Structures & Algorithms problem statements.
             Topics: Trees, Graphs, Recursion, DP.
             Difficulty: ${difficulty}
-            Output JSON: { "questions": [...] }`;
+            Output JSON: { "questions": ["Question 1 text", ...] }`;
         } else if (type === "HR") {
             promptBatch1 = `Generate 12 mostly asked HR Interview questions.
             Focus on: Self-intro, Strengths/Weaknesses, Career Goals.
             Difficulty: ${difficulty}
-            Output JSON: { "questions": [...] }`;
+            Output JSON: { "questions": ["Question 1 text", ...] }`;
 
             promptBatch2 = `Generate 12 mostly asked Behavioral Interview questions.
             Focus on: Conflict resolution, Teamwork, Leadership, Situational.
             Difficulty: ${difficulty}
-            Output JSON: { "questions": [...] }`;
+            Output JSON: { "questions": ["Question 1 text", ...] }`;
         } else {
             // Default Technical
             promptBatch1 = `Generate 12 mostly asked structured interview questions for a Software Engineering candidate focused on "${topic}". Batch 1/2.
             Difficulty: ${difficulty}
-            Output JSON: { "questions": [...] }`;
+            Output JSON: { "questions": ["Question 1 text", ...] }`;
     
             promptBatch2 = `Generate 12 mostly asked structured interview questions for a Software Engineering candidate focused on "${topic}". Batch 2/2 (Ensure unique questions).
             Difficulty: ${difficulty}
-            Output JSON: { "questions": [...] }`;
+            Output JSON: { "questions": ["Question 1 text", ...] }`;
         }
 
         try {
@@ -135,9 +135,16 @@ class AiService {
             if (results[0].status === 'rejected') console.error("Batch 1 Failed:", results[0].reason);
             if (results[1].status === 'rejected') console.error("Batch 2 Failed:", results[1].reason);
 
-            // Merge and re-index
+            // Merge and re-index with robust mapping
             let allQuestions = [...questions1, ...questions2].map((q, i) => {
-                const qText = typeof q === 'object' ? q.question : q;
+                let qText;
+                if (typeof q === 'string') {
+                    qText = q;
+                } else if (typeof q === 'object') {
+                    qText = q.question || q.text || q.content || q.statement || JSON.stringify(q);
+                } else {
+                    qText = "Question data unavailable";
+                }
                 return { id: i + 1, question: qText, type: type };
             });
 
@@ -182,9 +189,11 @@ class AiService {
         Question: "${question}"
         
         Output JSON:
+        Output JSON:
         {
             "explanation": "Brief explanation of the concept...",
             "modelAnswer": "A strong, professional example answer...",
+            "codeSnippet": "Optional: valid code example (Python/JS) if the question is technical/algorithmic, else null...",
             "keyPoints": ["Key point 1", "Key point 2"]
         }`;
 

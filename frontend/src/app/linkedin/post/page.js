@@ -21,26 +21,34 @@ export default function LinkedInPostPage() {
     const [publishing, setPublishing] = useState(false);
     const [status, setStatus] = useState(null);
 
+    const [isConnected, setIsConnected] = useState(false);
+
     useEffect(() => {
-        const fetchProfile = async () => {
+        const checkStatus = async () => {
             const token = localStorage.getItem('syllabus_auth_token');
             if (!token) return router.push('/auth/login');
 
             try {
-                const res = await fetch('/api/user/profile', {
+                const res = await fetch('/api/auth/linkedin/status', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await res.json();
-                if (data.success) {
-                    setUser(data.user);
-                }
+                setIsConnected(data.connected);
+                
+                // Also fetch profile for name/image
+                const profileRes = await fetch('/api/user/profile', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const profileData = await profileRes.json();
+                if (profileData.success) setUser(profileData.user);
+
             } catch (err) {
                 console.error(err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchProfile();
+        checkStatus();
     }, [router]);
 
     const handleConnect = () => {
@@ -141,7 +149,7 @@ export default function LinkedInPostPage() {
                             </CardHeader>
                         
                             <CardContent className="p-6 space-y-6">
-                                {!user?.linkedinAccessToken ? (
+                                {!isConnected ? (
                                     <div className="text-center py-16 space-y-6">
                                         <div className="p-6 rounded-full bg-blue-50 dark:bg-blue-900/20 inline-block shadow-inner ring-1 ring-blue-100 dark:ring-blue-900/50">
                                             <Linkedin size={48} className="text-[#0077b5]" />

@@ -10,55 +10,69 @@ function CallbackContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [status, setStatus] = useState('processing'); // processing, success, error
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
-        const code = searchParams.get('code');
-        const error = searchParams.get('error');
-
-        if (error) {
-            setStatus('error');
-            return;
-        }
-
-        if (code) {
-            connectLinkedIn(code);
-        } else {
-            setStatus('error');
-        }
-    }, [searchParams, router]);
-
-    const connectLinkedIn = async (code) => {
-        const token = localStorage.getItem('syllabus_auth_token');
-        if (!token) {
-            router.push('/auth/login');
-            return;
-        }
-
-        try {
-            const res = await fetch('http://localhost:4000/api/auth/linkedin/connect', {
-                method: 'POST',
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ code })
-            });
-
-            const data = await res.json();
-            if (data.success) {
-                setStatus('success');
-                setTimeout(() => {
-                    router.push('/linkedin/post');
-                }, 2000);
-            } else {
-                console.error(data.error);
-                setStatus('error');
+        const connectLinkedIn = async (code) => {
+            const token = localStorage.getItem('syllabus_auth_token');
+            if (!token) {
+                router.push('/auth/login');
+                return;
             }
-        } catch (err) {
-            console.error(err);
-            setStatus('error');
-        }
-    };
+
+            try {
+                const res = await fetch('http://localhost:4000/api/auth/linkedin/connect', {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code })
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    const errData = await res.json().catch(() => ({ error: 'Unauthorized' }));
+                    setStatus('error');
+                    setErrorMessage(`Auth Failed: ${errData.error} (Status: ${res.status})`);
+                    return;
+                }
+
+                const data = await res.json();
+                if (data.success) {
+                    setStatus('success');
+                    setTimeout(() => {
+                        router.push('/linkedin/post');
+                    }, 2000);
+                } else {
+                    setStatus('error');
+                    setErrorMessage(data.error || "Connection failed on server.");
+                }
+            } catch (err) {
+                setStatus('error');
+                setErrorMessage(err.message || "Network error occurred.");
+            }
+        };
+
+        const handleCallback = async () => {
+            const code = searchParams.get('code');
+            const error = searchParams.get('error');
+
+            if (error) {
+                setStatus('error');
+                setErrorMessage(error);
+                return;
+            }
+
+            if (code) {
+                await connectLinkedIn(code);
+            } else {
+                setStatus('error');
+                setErrorMessage("No authorization code found.");
+            }
+        };
+
+        handleCallback();
+    }, [searchParams, router]);
 
     return (
         <div className="flex flex-col h-[60vh] items-center justify-center">
@@ -82,16 +96,29 @@ function CallbackContent() {
                         <>
                             <XCircle className="w-12 h-12 text-red-500" />
                             <h2 className="text-xl font-semibold">Connection Failed</h2>
-                            <p className="text-muted-foreground text-center">
-                                We couldn't connect your LinkedIn account.<br/>
-                                Please try again.
+                            <p className="text-muted-foreground text-center text-red-400 px-4">
+                                {errorMessage || "We couldn't connect your LinkedIn account."}
                             </p>
-                            <button 
-                                onClick={() => router.push('/linkedin/post')}
-                                className="mt-4 text-indigo-600 hover:underline"
-                            >
-                                Return to Post Page
-                            </button>
+                            
+                            {errorMessage?.includes("Session Expired") || errorMessage?.includes("Auth Failed") ? (
+                                <button 
+                                    onClick={() => {
+                                        localStorage.removeItem('syllabus_auth_token');
+                                        localStorage.removeItem('user');
+                                        router.push('/auth/login');
+                                    }}
+                                    className="mt-6 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-medium transition-colors shadow-lg shadow-indigo-500/30"
+                                >
+                                    Log In Again
+                                </button>
+                            ) : (
+                                <button 
+                                    onClick={() => router.push('/linkedin/post')}
+                                    className="mt-4 text-indigo-600 hover:underline"
+                                >
+                                    Return to Post Page
+                                </button>
+                            )}
                         </>
                     )}
                 </CardContent>

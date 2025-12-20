@@ -15,6 +15,8 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
 
+    const [error, setError] = useState(null);
+
     useEffect(() => {
         const fetchProfile = async () => {
             const token = localStorage.getItem('syllabus_auth_token');
@@ -32,10 +34,17 @@ export default function ProfilePage() {
                     const data = await res.json();
                     if (data.success) {
                         setUser(data.user);
+                    } else {
+                        setError(data.error || "Failed to load profile data");
                     }
+                } else if (res.status === 403 || res.status === 401) {
+                    setError("Session Expired");
+                } else {
+                    setError(`Server Error: ${res.status}`);
                 }
             } catch (err) {
                 console.error("Profile Fetch Error:", err);
+                setError("Network error: Could not reach server");
             } finally {
                 setLoading(false);
             }
@@ -53,10 +62,42 @@ export default function ProfilePage() {
         </DashboardLayout>
     );
 
-    if (!user) return null;
+    if (error === "Session Expired" || error?.includes("403")) return (
+         <DashboardLayout title="Personnel Record">
+            <div className="flex h-[50vh] items-center justify-center flex-col gap-4">
+                <div className="text-amber-500 font-bold font-heading text-xl">SESSION TERMINATED</div>
+                <div className="text-slate-400">Security protocol requires re-authentication.</div>
+                 <NeonButton onClick={() => {
+                     localStorage.removeItem('syllabus_auth_token');
+                     router.push('/auth/login');
+                 }} variant="primary" glowColor="amber">
+                    Re-Initialize Link
+                </NeonButton>
+            </div>
+        </DashboardLayout>
+    );
+
+    if (error) return (
+         <DashboardLayout title="Personnel Record">
+            <div className="flex h-[50vh] items-center justify-center flex-col gap-4">
+                <div className="text-red-500 font-bold">ACCESS DENIED: {error}</div>
+                 <NeonButton onClick={() => window.location.reload()} variant="primary" glowColor="red">
+                    Retry Connection
+                </NeonButton>
+            </div>
+        </DashboardLayout>
+    );
+
+    if (!user) return (
+        <DashboardLayout title="Personnel Record">
+            <div className="flex h-[50vh] items-center justify-center">
+                 <div className="text-slate-500">No profile data found.</div>
+            </div>
+        </DashboardLayout>
+    );
 
     return (
-        <DashboardLayout title="Personnel Record">
+        <DashboardLayout title="My Profile">
             <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-1000">
                 
                 {/* Profile Header Card */}
@@ -109,7 +150,7 @@ export default function ProfilePage() {
                                         <h1 className="text-4xl md:text-5xl font-heading font-bold text-white tracking-wide uppercase drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">{user.name}</h1>
                                         <ShieldCheck className="h-6 w-6 text-aurora-green animate-pulse" />
                                     </div>
-                                    <p className="text-xl text-plasma-cyan font-mono tracking-widest uppercase">{user.role || "Cadet Pilot"}</p>
+                                    <p className="text-xl text-plasma-cyan font-mono tracking-widest uppercase">{user.role || "Software Engineer"}</p>
                                 </div>
                                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-slate-400 text-sm font-mono">
                                     <span className="flex items-center gap-1.5 px-3 py-1 rounded bg-white/5 border border-white/5"><Mail className="w-3.5 h-3.5" /> {user.email}</span>
@@ -123,7 +164,7 @@ export default function ProfilePage() {
                                 onClick={() => router.push('/profile/edit')}
                                 variant="cyan"
                             >
-                                <Edit className="w-4 h-4 mr-2" /> Modify Profile
+                                <Edit className="w-4 h-4 mr-2" /> Edit Profile
                             </NeonButton>
                         </div>
                     </div>
@@ -135,10 +176,10 @@ export default function ProfilePage() {
                         <HolographicCard className="p-8">
                             <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/10">
                                 <User className="h-6 w-6 text-nebula-purple" />
-                                <h2 className="text-xl font-heading font-bold text-white uppercase tracking-wider">Bio-Data</h2>
+                                <h2 className="text-xl font-heading font-bold text-white uppercase tracking-wider">About Me</h2>
                             </div>
                             <p className="text-slate-300 leading-relaxed text-lg font-light">
-                                {user.bio || "No biography data available in the mainframe. Pilot has not yet synchronized their personal history log."}
+                                {user.bio || "No biography available. Update your profile to share your professional background."}
                             </p>
                         </HolographicCard>
 
@@ -146,7 +187,7 @@ export default function ProfilePage() {
                          <HolographicCard className="p-8">
                             <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/10">
                                 <Award className="h-6 w-6 text-solar-gold" />
-                                <h2 className="text-xl font-heading font-bold text-white uppercase tracking-wider">Mission Log</h2>
+                                <h2 className="text-xl font-heading font-bold text-white uppercase tracking-wider">Recent Activity</h2>
                             </div>
                             <div className="flex flex-col gap-4">
                                 <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center gap-4">
@@ -154,8 +195,8 @@ export default function ProfilePage() {
                                         <Sparkles className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <p className="text-white font-bold text-sm">System Initialization</p>
-                                        <p className="text-xs text-slate-400">Account created & verified</p>
+                                        <p className="text-white font-bold text-sm">Account Active</p>
+                                        <p className="text-xs text-slate-400">Profile initialized and verified</p>
                                     </div>
                                     <span className="ml-auto text-xs font-mono text-slate-500">Today</span>
                                 </div>
@@ -169,7 +210,7 @@ export default function ProfilePage() {
                          <HolographicCard className="p-6">
                             <div className="flex items-center gap-3 mb-6">
                                 <Zap className="h-5 w-5 text-plasma-cyan" />
-                                <h2 className="text-lg font-heading font-bold text-white uppercase tracking-wider">Skill Matrix</h2>
+                                <h2 className="text-lg font-heading font-bold text-white uppercase tracking-wider">Skills & Technologies</h2>
                             </div>
                              <div className="flex flex-wrap gap-2">
                                 {user.skills ? user.skills.split(',').filter(Boolean).map((s, i) => (
@@ -177,23 +218,23 @@ export default function ProfilePage() {
                                         {s.trim()}
                                     </span>
                                 )) : (
-                                    <span className="text-slate-500 text-sm italic">No skills calibrated.</span>
+                                    <span className="text-slate-500 text-sm italic">No skills listed.</span>
                                 )}
                             </div>
                             <NeonButton variant="ghost" size="sm" className="w-full mt-6 text-xs" onClick={() => router.push('/profile/edit')}>
-                                + Calibrate New Skill
+                                + Add Skills
                             </NeonButton>
                         </HolographicCard>
 
                         <HolographicCard className="p-6">
                             <div className="flex items-center gap-3 mb-6">
                                 <Briefcase className="h-5 w-5 text-aurora-green" />
-                                <h2 className="text-lg font-heading font-bold text-white uppercase tracking-wider">Service Record</h2>
+                                <h2 className="text-lg font-heading font-bold text-white uppercase tracking-wider">Experience</h2>
                             </div>
                             <div className="space-y-6">
                                 <div className="relative pl-6 border-l-2 border-white/10 pb-2">
                                     <div className="absolute top-1.5 -left-[5px] w-2.5 h-2.5 rounded-full bg-aurora-green shadow-[0_0_10px_#2DD4BF]" />
-                                    <h4 className="font-bold text-sm text-white uppercase tracking-wide">Cadet Engineer</h4>
+                                    <h4 className="font-bold text-sm text-white uppercase tracking-wide">Software Engineer</h4>
                                     <p className="text-xs font-mono text-aurora-green mb-1">Tech Corp // Internship</p>
                                     <p className="text-[10px] text-slate-500 font-mono">2023 - Present</p>
                                 </div>
@@ -203,7 +244,7 @@ export default function ProfilePage() {
                                     <p className="text-xs font-mono text-slate-500 mb-1">CS Dept</p>
                                     <p className="text-[10px] text-slate-500 font-mono">2020 - 2024</p>
                                 </div>
-                                <NeonButton variant="ghost" size="sm" className="w-full text-xs text-slate-400 hover:text-white">View Full Log</NeonButton>
+                                <NeonButton variant="ghost" size="sm" className="w-full text-xs text-slate-400 hover:text-white">View Full History</NeonButton>
                             </div>
                         </HolographicCard>
                     </div>

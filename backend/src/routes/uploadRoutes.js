@@ -39,25 +39,39 @@ const upload = multer({
 });
 
 // POST /api/upload
-router.post('/', upload.single('file'), (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ error: 'No file uploaded' });
+// POST /api/upload
+router.post('/', (req, res) => {
+    upload.single('file')(req, res, (err) => {
+        if (err) {
+            console.error("Multer Error:", err);
+            if (err instanceof multer.MulterError) {
+                // A Multer error occurred when uploading.
+                return res.status(400).json({ error: `Upload error: ${err.message}` });
+            } else if (err) {
+                // An unknown error occurred when uploading.
+                return res.status(400).json({ error: err.message });
+            }
         }
 
-        // Construct URL
-        const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
-        const fileUrl = `${baseUrl}/uploads/${req.file.filename}`;
+        try {
+            if (!req.file) {
+                return res.status(400).json({ error: 'No file uploaded' });
+            }
 
-        res.json({
-            success: true,
-            url: fileUrl,
-            filename: req.file.filename
-        });
-    } catch (error) {
-        console.error("Upload Error:", error);
-        res.status(500).json({ error: 'Upload failed' });
-    }
+            // Construct URL
+            const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
+            const fileUrl = `${baseUrl}/uploads/${req.file.filename}`;
+
+            res.json({
+                success: true,
+                url: fileUrl,
+                filename: req.file.filename
+            });
+        } catch (error) {
+            console.error("Upload Logic Error:", error);
+            res.status(500).json({ error: 'Upload processing failed' });
+        }
+    });
 });
 
 module.exports = router;

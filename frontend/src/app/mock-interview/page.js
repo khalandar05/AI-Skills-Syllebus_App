@@ -243,7 +243,12 @@ export default function MockInterviewPage() {
                                             <Activity className="h-4 w-4" /> Calibration Parameters
                                         </label>
                                         <Input 
-                                            placeholder="e.g. Senior React Developer, System Design, Python Backend" 
+                                            placeholder={
+                                                interviewType === 'HR' ? "e.g. Leadership, Conflict Resolution, Strengths" :
+                                                interviewType === 'Aptitude' ? "e.g. Probability, Logical Reasoning, Time & Work" :
+                                                interviewType === 'DSA' ? "e.g. Dynamic Programming, Graph Theory, Trees" :
+                                                "e.g. Senior React Developer, System Design, Python Backend"
+                                            }
                                             value={context}
                                             onChange={(e) => setContext(e.target.value)}
                                             className="h-14 bg-black/40 border-white/10 focus:border-plasma-cyan text-white text-lg font-mono placeholder:text-slate-600 rounded-none border-l-2 border-l-white/20"
@@ -418,9 +423,9 @@ export default function MockInterviewPage() {
                                 {explanation && (
                                     <motion.div 
                                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
-                                        className="absolute bottom-6 right-6 lg:static lg:mt-6 z-20"
+                                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
                                     >
-                                        <HolographicCard className="border-plasma-cyan/40 shadow-[0_0_30px_rgba(34,211,238,0.1)] bg-black/90 backdrop-blur-xl">
+                                        <HolographicCard className="border-plasma-cyan/40 shadow-[0_0_30px_rgba(34,211,238,0.1)] bg-black/90 backdrop-blur-xl w-full max-w-2xl mx-auto">
                                             <div className="p-4 flex items-center justify-between border-b border-white/10">
                                                 <div className="flex items-center gap-2 text-plasma-cyan font-bold text-xs uppercase tracking-widest">
                                                     <Lightbulb className="h-4 w-4" /> Intel Database
@@ -432,11 +437,30 @@ export default function MockInterviewPage() {
                                                     <button onClick={() => { setExplanation(null); stopSpeaking(); }} className="text-slate-500 hover:text-white p-1">×</button>
                                                 </div>
                                             </div>
-                                            <div className="p-4 text-sm text-slate-300 max-h-[200px] overflow-y-auto custom-scrollbar space-y-3 font-light">
-                                                <p>{explanation.explanation}</p>
-                                                <div className="bg-white/5 p-3 rounded border border-white/5">
-                                                    <span className="text-[10px] text-slate-500 uppercase font-bold block mb-1">Optimal Response Protocol</span>
-                                                    <p className="italic text-slate-400">&quot;{explanation.modelAnswer}&quot;</p>
+                                            <div className="p-6 text-sm text-slate-300 max-h-[60vh] overflow-y-auto custom-scrollbar space-y-4 font-light">
+                                                <p className="leading-relaxed">{explanation.explanation}</p>
+                                                
+                                                {explanation.codeSnippet && (
+                                                    <div className="relative group rounded-lg overflow-hidden border border-white/10 bg-black/50 mt-4">
+                                                        <div className="flex justify-between items-center px-4 py-2 bg-white/5 border-b border-white/5">
+                                                            <span className="text-[10px] uppercase font-bold text-slate-500">Code Reference</span>
+                                                            <button 
+                                                                onClick={() => navigator.clipboard.writeText(explanation.codeSnippet)}
+                                                                className="text-xs text-plasma-cyan hover:text-white flex items-center gap-1 transition-colors"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                                                Copy
+                                                            </button>
+                                                        </div>
+                                                        <pre className="p-4 overflow-x-auto text-xs font-mono text-emerald-400">
+                                                            <code>{explanation.codeSnippet}</code>
+                                                        </pre>
+                                                    </div>
+                                                )}
+
+                                                <div className="bg-white/5 p-4 rounded border border-white/5 mt-4">
+                                                    <span className="text-[10px] text-slate-500 uppercase font-bold block mb-2">Optimal Response Protocol</span>
+                                                    <p className="italic text-slate-400 leading-relaxed">&quot;{explanation.modelAnswer}&quot;</p>
                                                 </div>
                                             </div>
                                         </HolographicCard>

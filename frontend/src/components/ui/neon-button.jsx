@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button as BaseButton } from "@/components/ui/button";
 
-export const NeonButton = React.forwardRef(({ className, variant="primary", children, ...props }, ref) => {
+export const NeonButton = React.forwardRef(({ className, variant="primary", children, glowColor, ...props }, ref) => {
   
   const variants = {
     primary: "bg-primary text-white shadow-[0_0_15px_rgba(109,40,217,0.5)] hover:shadow-[0_0_25px_rgba(109,40,217,0.8)] border-transparent hover:bg-primary/90",

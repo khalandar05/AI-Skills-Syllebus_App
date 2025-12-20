@@ -14,12 +14,15 @@ module.exports = (req, res, next) => {
     const token = authHeader.split(' ')[1];
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'supersecretkey');
+        const secret = process.env.JWT_SECRET || 'supersecretkey';
+        console.log(`[DEBUG] AuthMiddleware Secret: ${secret.substring(0, 3)}...`);
+        const decoded = jwt.verify(token, secret);
         req.user = decoded;
         req.headers['x-user-id'] = decoded.userId; // Polyfill for existing code
         next();
     } catch (error) {
         console.error("Auth Middleware Error:", error.message);
+        console.error("Token causing error:", token.substring(0, 20) + "...");
         return res.status(403).json({ error: 'Invalid token' });
     }
 };

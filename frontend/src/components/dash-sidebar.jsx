@@ -5,9 +5,16 @@ import { Button } from '@/components/ui/button';
 import { useRouter, usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 
+import { useEffect, useState } from 'react';
+
 export function Sidebar() {
     const router = useRouter();
     const pathname = usePathname();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const menuItems = [
         { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
@@ -51,7 +58,7 @@ export function Sidebar() {
                     Command Deck
                 </div>
                 {menuItems.map((item) => {
-                    const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                    const isActive = mounted && (pathname === item.href || pathname.startsWith(`${item.href}/`));
                     return (
                         <Button
                             key={item.href}
