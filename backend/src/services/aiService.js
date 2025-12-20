@@ -35,6 +35,7 @@ class AiService {
             });
 
             const content = completion.choices[0].message.content;
+            console.log("[DEBUG] AI Raw Content (truncated):", content.substring(0, 200));
             return JSON.parse(content);
         } catch (error) {
             console.error("AI Generation Error:", error);
@@ -245,18 +246,26 @@ class AiService {
     }
 
     async generateProjectAssets(projectTitle, description, techStack) {
-         const prompt = `Generate asset content for project "${projectTitle}".
-         Description: ${description}
-         Stack: ${techStack}
+         const prompt = `Act as a Senior Developer Advocate and Career Coach. 
+         Generate high-impact portfolio assets for the project: "${projectTitle}".
          
+         Context:
+         - Description: ${description}
+         - Tech Stack: ${techStack}
+         
+         Requirements:
+         1. **Resume Bullet Points**: Generate 4-5 dense, metric-heavy bullet points (25-40 words each). Focus on specific technical achievements, optimizations (e.g. "Reduced latency by 40%"), and architectural decisions. Use strong action verbs (Architected, Deployed, Engineered).
+         2. **LinkedIn Post**: Write a professional, engaging post (100-150 words) using a storytelling hook ("I used to struggle with...", "Here is how I solved..."). explain the problem and the solution. End with a Call To Action and 5-8 relevant, trending tech hashtags.
+         3. **README**: A brief but professional README introduction.
+
          Output JSON:
          {
              "readme": "# ${projectTitle}\\n...",
-             "linkedInPost": "Check out my new project...",
-             "resumeBullets": ["Built X using Y", "Optimized Z"]
+             "linkedInPost": "🚀 Just shipped ${projectTitle}! ... #Tag1 #Tag2",
+             "resumeBullets": ["Architected a scalable...", "Optimized database queries..."]
          }`;
          
-         return await this.generateJson(prompt, "Project Manager.");
+         return await this.generateJson(prompt, "You are a Tech Career Expert.");
     }
     async generatePortfolioContent(userContext) {
         const prompt = `Generate professional portfolio content for a software engineer.
@@ -282,6 +291,46 @@ class AiService {
         }`;
 
         return await this.generateJson(prompt, "You are a sort-after Tech Recruiter and Resume Expert.");
+    }
+    async generateResearchRoadmap(idea) {
+        const prompt = `Act as a Senior Principal Engineer and Research Architect.
+        
+        The user has a Project Idea / Problem Statement: "${idea}".
+        
+        Your Goal: Perform a "Deep Research" simulation to generate a comprehensive, professional implementation roadmap. This must be practical, industry-standard, and 'Portfolio-Ready'.
+
+        Analyze:
+        1. **Core Problem**: What is the real-world pain point?
+        2. **Technical Feasibility**: What is the best, modern tech stack? (e.g. Next.js 14, Supabase, Stripe, LangChain).
+        3. **Step-by-Step Execution**: Granular tasks from setup to deployment.
+
+        Output strictly valid JSON with this structure:
+        {
+            "title": "A Professional, Catchy Project Title",
+            "description": "A refined, technical description (2-3 sentences) selling the project's value.",
+            "difficulty": "Intermediate",
+            "techStack": ["Next.js", "Tailwind", "Supabase", "etc..."],
+            "roadmap": [
+                {
+                    "stepNumber": 1,
+                    "title": "Phase 1: Foundation & Setup",
+                    "description": "Initialize repo, setup shadcn/ui, configure database schema...",
+                    "resources": ["Official Next.js Docs", "Supabase Auth Helpers Guide"],
+                    "estimatedTime": "2 Days"
+                },
+                // ... Generate 6-10 detailed phases
+            ],
+            "repoStats": {
+                "problemStatement": "Clear definition of the problem being solved...",
+                "realWorldApplication": "Who would use this? (e.g. 'Small businesses needing inventory mgmt')",
+                "coreConceptsUsed": ["Authentication", "RBAC", "Server Actions", "Webhooks"],
+                "risksChallenges": "Potential scale issues, API rate limits, etc...",
+                "architectureOverview": "Brief explanation of the system design (e.g. 'Event-driven architecture using AWS Lambda...').",
+                "syllabus_topics_used": ["Modern Web Development", "System Design", "Cloud Engineering"] 
+            }
+        }`;
+
+        return await this.generateJson(prompt, "You are a Senior Principal Engineer.");
     }
 }
 

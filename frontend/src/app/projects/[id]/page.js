@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardTitle, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,74 +15,105 @@ export default function ProjectWorkspace({ params }) {
     const searchParams = useSearchParams();
     const router = useRouter();
 
-    // Data from URL
-    const id = searchParams.get('id');
-    const title = searchParams.get('title') || 'Project Workspace';
-    const description = searchParams.get('description') || '';
-    const techStack = searchParams.get('techStack') ? searchParams.get('techStack').split(',') : [];
+    // Data from URL (Fallback)
+    const id = searchParams.get('id') || params.id;
+    
+    const [loading, setLoading] = useState(true);
+    const [projectData, setProjectData] = useState(null);
+    const [tasks, setTasks] = useState([]);
+    const [repoStats, setRepoStats] = useState({});
 
-    // Parse RepoStats (contains "Mentor" data)
-    let repoStats = {};
-    try {
-        const rawStats = searchParams.get('repoStats');
-        if (rawStats) repoStats = JSON.parse(rawStats);
-    } catch (e) {}
+    // Fetch Project Data
+    useEffect(() => {
+        if (!id) return;
+        const fetchProject = async () => {
+            try {
+                const token = localStorage.getItem('syllabus_auth_token');
+                const res = await fetch(`/api/projects/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    setProjectData(data.project);
+                    setRepoStats(data.project.repoStats || {});
+                    
+                    // Parse Roadmap
+                    let loadedRoadmap = [];
+                    if (Array.isArray(data.project.roadmap)) {
+                        loadedRoadmap = data.project.roadmap;
+                    } else if (typeof data.project.roadmap === 'string') {
+                        try { loadedRoadmap = JSON.parse(data.project.roadmap); } catch(e) {}
+                    }
 
-    const {
-        architectureOverview,
-        risksChallenges,
-        evaluationCriteria,
-        realWorldApplication,
-        problemStatement,
-        whyThisMatchesTheSyllabus,
-        coreConceptsUsed,
-        expectedLearningOutcomes,
-        projectScope,
-        real_world_scenario,
-        syllabus_topics_used
-    } = repoStats;
-
-    // Parse Roadmap
-    let initialRoadmap = [];
-    try {
-        const rawRoadmap = searchParams.get('roadmap');
-        if (rawRoadmap) {
-            const decoded = decodeURIComponent(rawRoadmap);
-            const parsed = JSON.parse(decoded);
-            // Handle Structure: Array of Weeks
-            if (Array.isArray(parsed)) {
-                if (parsed.length > 0 && parsed[0].week) {
-                     parsed.forEach(week => {
-                         week.tasks.forEach(t => {
-                             initialRoadmap.push({ week: week.week, task: t, status: "TODO" });
-                         });
-                     });
-                } else if (parsed[0].task) {
-                    initialRoadmap = parsed.map(p => ({ ...p, week: 'General' }));
+                    // Restore Status from RepoStats
+                    const taskStatuses = data.project.repoStats?.taskStatuses || {};
+                    
+                    const mappedTasks = loadedRoadmap.map((step, idx) => ({
+                         ...step,
+                         task: step.title || step.task, // Normalize
+                         status: taskStatuses[idx] || 'TODO', 
+                         week: step.estimatedTime || 'Phase ' + (step.stepNumber || 1)
+                    }));
+                    
+                    setTasks(mappedTasks.length ? mappedTasks : [{ task: "Initialize Repo", status: "TODO", week: "Setup" }]);
                 }
+            } catch (e) {
+                console.error("Failed to load project", e);
+            } finally {
+                setLoading(false);
             }
-        }
-    } catch (e) {
-        console.error("Roadmap parse error", e);
-    }
+        };
+        fetchProject();
+    }, [id]);
 
-    const [tasks, setTasks] = useState(initialRoadmap.length ? initialRoadmap : [{ task: "Initialize Repo", status: "TODO", week: "Setup" }]);
     const [showCompletion, setShowCompletion] = useState(false);
     const [copiedField, setCopiedField] = useState(null);
     const [generatedAssets, setGeneratedAssets] = useState(null);
     const [completing, setCompleting] = useState(false);
 
-    const moveTask = (taskIndex, newStatus) => {
+    // Destructure repoStats for easy access in JSX
+    const { 
+        problemStatement, 
+        realWorldApplication, 
+        coreConceptsUsed, 
+        risksChallenges, 
+        architectureOverview, 
+        syllabus_topics_used,
+        // Legacy/Fallback keys
+        real_world_scenario,
+        whyThisMatchesTheSyllabus,
+        expectedLearningOutcomes,
+        projectScope,
+        evaluationCriteria
+    } = repoStats || {};
+
+    const moveTask = async (taskIndex, newStatus) => {
         const newTasks = [...tasks];
         newTasks[taskIndex].status = newStatus;
         setTasks(newTasks);
-    };
 
-    const copyToClipboard = (text, field) => {
-        if (!text) return;
-        navigator.clipboard.writeText(text);
-        setCopiedField(field);
-        setTimeout(() => setCopiedField(null), 2000);
+        // Persist Progress
+        try {
+            // Create a map of { index: status } for all non-TODO items
+            const taskStatuses = newTasks.reduce((acc, t, i) => {
+                if (t.status && t.status !== 'TODO') acc[i] = t.status;
+                return acc;
+            }, {});
+            
+            const token = localStorage.getItem('syllabus_auth_token');
+            await fetch(`/api/projects/${id}`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({
+                    repoStats: { ...repoStats, taskStatuses }
+                })
+            });
+        } catch (e) {
+            console.error("Failed to save progress", e);
+        }
     };
 
     const handleComplete = async () => {
@@ -111,6 +142,12 @@ export default function ProjectWorkspace({ params }) {
         } finally {
             setCompleting(false);
         }
+    };
+
+    const copyToClipboard = (text, field) => {
+        navigator.clipboard.writeText(text);
+        setCopiedField(field);
+        setTimeout(() => setCopiedField(null), 2000);
     };
 
     // VIBGYOR Color Palette
@@ -206,48 +243,57 @@ export default function ProjectWorkspace({ params }) {
                     <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Back to Projects
                 </Button>
 
-                <div className="flex flex-col lg:flex-row justify-between gap-8 bg-card/40 backdrop-blur-sm p-6 rounded-2xl border border-border/50">
-                    <div className="space-y-4 max-w-3xl">
-                        <div className="space-y-2">
-                             <div className="flex items-center gap-2">
-                                <Badge variant="outline" className="text-primary border-primary/20 bg-primary/5">Enterprise Project</Badge>
-                                <span className="text-xs text-muted-foreground font-mono">ID: {id.slice(0,8)}</span>
-                             </div>
-                             <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">{title}</h1>
-                        </div>
-                        <p className="text-lg text-muted-foreground leading-relaxed">{description}</p>
-                        
-                        <div className="flex flex-wrap gap-2 pt-2">
-                            {techStack.map(t => (
-                                <Badge key={t} variant="secondary" className="px-3 py-1 text-sm bg-secondary/50 hover:bg-secondary/80 font-medium">
-                                    {t.trim()}
-                                </Badge>
-                            ))}
-                        </div>
+                {loading ? (
+                    <div className="flex justify-center items-center h-64">
+                        <Loader2 className="w-8 h-8 animate-spin text-primary" />
                     </div>
-
-                    <div className="flex flex-col gap-4 min-w-[240px]">
-                         <div className="glass-card p-4 rounded-xl">
-                            <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                                <Activity className="w-4 h-4 text-primary" /> Project Health
-                            </h3>
-                            <div className="space-y-2 text-sm text-muted-foreground">
-                                <div className="flex justify-between text-xs font-medium uppercase tracking-wider">
-                                    <span>Progress</span>
-                                    <span>{Math.round((tasks.filter(t => t.status === 'DONE').length / tasks.length) * 100)}%</span>
+                ) : (
+                    <div className="flex flex-col lg:flex-row justify-between gap-8 bg-card/40 backdrop-blur-sm p-6 rounded-2xl border border-border/50">
+                        <div className="space-y-4 max-w-3xl">
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                    <Badge variant="outline" className="text-primary border-primary/20 bg-primary/5">Enterprise Project</Badge>
+                                    <span className="text-xs text-muted-foreground font-mono">ID: {id?.slice(0,8)}</span>
                                 </div>
-                                <div className="w-full bg-secondary rounded-full h-2.5 overflow-hidden">
-                                    <div className="bg-gradient-to-r from-primary to-purple-500 h-full transition-all duration-500 shadow-[0_0_10px_rgba(79,70,229,0.3)]" style={{ width: `${(tasks.filter(t => t.status === 'DONE').length / tasks.length) * 100}%` }} />
+                                <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                                    {projectData?.title}
+                                </h1>
+                            </div>
+                            <p className="text-lg text-muted-foreground leading-relaxed">{projectData?.description}</p>
+                            
+                            <div className="flex flex-wrap gap-2 pt-2">
+                                {/* Fixed techStack rendering to handle both array and string (some legacy data) */}
+                                {(Array.isArray(projectData?.techStack) ? projectData.techStack : (projectData?.techStack || '').split(',')).map((t, i) => (
+                                    <Badge key={i} variant="secondary" className="px-3 py-1 text-sm bg-secondary/50 hover:bg-secondary/80 font-medium">
+                                        {t.trim()}
+                                    </Badge>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-4 min-w-[240px]">
+                            <div className="glass-card p-4 rounded-xl">
+                                <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                                    <Activity className="w-4 h-4 text-primary" /> Project Health
+                                </h3>
+                                <div className="space-y-2 text-sm text-muted-foreground">
+                                    <div className="flex justify-between text-xs font-medium uppercase tracking-wider">
+                                        <span>Progress</span>
+                                        <span>{Math.round((tasks.filter(t => t.status === 'DONE').length / (tasks.length || 1)) * 100)}%</span>
+                                    </div>
+                                    <div className="w-full bg-secondary rounded-full h-2.5 overflow-hidden">
+                                        <div className="bg-gradient-to-r from-primary to-purple-500 h-full transition-all duration-500 shadow-[0_0_10px_rgba(79,70,229,0.3)]" style={{ width: `${(tasks.filter(t => t.status === 'DONE').length / (tasks.length || 1)) * 100}%` }} />
+                                    </div>
                                 </div>
                             </div>
-                         </div>
 
-                        <Button onClick={handleComplete} disabled={completing} className="w-full gap-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white shadow-lg shadow-emerald-500/20 h-10 font-bold tracking-wide transition-all hover:scale-[1.02]">
-                            {completing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                            Finalize Project
-                        </Button>
+                            <Button onClick={handleComplete} disabled={completing} className="w-full gap-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white shadow-lg shadow-emerald-500/20 h-10 font-bold tracking-wide transition-all hover:scale-[1.02]">
+                                {completing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                Finalize Project
+                            </Button>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 <Tabs defaultValue="roadmap" className="w-full">
                     <TabsList className="mb-8 p-1 bg-muted/30 border border-border/40 rounded-lg w-full max-w-3xl grid grid-cols-4">
@@ -309,11 +355,11 @@ export default function ProjectWorkspace({ params }) {
                                 <div className="space-y-6">
                                     <div>
                                         <h4 className="font-semibold text-xs uppercase tracking-wide text-muted-foreground mb-2">Real-World Scenario</h4>
-                                        <p className="text-foreground leading-relaxed">{real_world_scenario || whyThisMatchesTheSyllabus || "Aligns with core syllabus topics."}</p>
+                                        <p className="text-foreground leading-relaxed">{realWorldApplication || real_world_scenario || whyThisMatchesTheSyllabus || "Aligns with core syllabus topics."}</p>
                                     </div>
                                     <div>
                                         <h4 className="font-semibold text-xs uppercase tracking-wide text-muted-foreground mb-2">Syllabus Grounding</h4>
-                                        <p className="text-sm text-muted-foreground">{syllabus_topics_used ? `Strictly based on: ${syllabus_topics_used.join(', ')}` : (projectScope || description)}</p>
+                                        <p className="text-sm text-muted-foreground">{syllabus_topics_used ? `Strictly based on: ${syllabus_topics_used.join(', ')}` : (projectScope || projectData?.description)}</p>
                                     </div>
                                 </div>
                             </div>

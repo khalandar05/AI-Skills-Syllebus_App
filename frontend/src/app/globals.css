@@ -45,6 +45,9 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   * {
     border-color: hsl(var(--border));
   }
@@ -55,6 +58,9 @@
     background-image: none;
     font-family: 'Inter', sans-serif;
     overflow-x: hidden; /* Prevent horizontal scroll from 3D elements */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility; /* Ensure crisp text */
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Outfit', sans-serif;
@@ -66,12 +72,14 @@
 /* 3D HOLOGRAPHIC UTILITIES */
 
 .glass-panel {
-  background: rgba(27, 31, 59, 0.4); /* Cosmic Indigo with opacity */
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(34, 211, 238, 0.1); /* Plasma Cyan subtle border */
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  /* Increased opacity for better text contrast - "Ultra-HD" look */
+  background: rgba(13, 16, 33, 0.85); 
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Sharper border */
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
   transition: all 0.3s ease;
+  will-change: transform, opacity;
 }
 
 /* For React Three Fiber Canvas z-index handling */
@@ -82,15 +90,16 @@
   width: 100vw;
   height: 100vh;
   z-index: -1; /* Behind everything */
-  pointer-events: none; /* Let clicks pass through if needed, though we might want interactive stars */
+  pointer-events: none;
 }
 
 /* Holographic Card */
 .holo-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  /* Semi-solid background for maximum readability */
+  background: linear-gradient(135deg, rgba(20, 24, 45, 0.9) 0%, rgba(20, 24, 45, 0.7) 100%);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
   position: relative;
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -140,5 +149,5 @@
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #22D3EE;
+  background: #334155; /* Slate-700 - reduced contrast */
 }

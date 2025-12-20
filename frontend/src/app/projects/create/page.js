@@ -7,8 +7,9 @@ import { HolographicCard } from '@/components/ui/holographic-card';
 import { Input } from '@/components/ui/input'; // We might need to style this or replace it
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'; 
-import { Loader2, Sparkles, Code2, ArrowLeft, ArrowRight, Wand2, Rocket } from 'lucide-react';
+import { Loader2, Sparkles, Code2, ArrowLeft, ArrowRight, Wand2, Rocket, BrainCircuit } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DashboardLayout } from '@/components/dash-layout';
 
@@ -31,7 +32,15 @@ export default function CreateProjectPage() {
         setLoading(true);
         try {
             const token = localStorage.getItem('syllabus_auth_token');
-            const res = await fetch('/api/projects/generate', {
+            // Bypass Next.js Proxy to avoid 30s timeout on Vercel/Next dev server
+            // Use direct backend URL (assuming localhost:4000 for dev)
+            const API_URL = window.location.hostname === 'localhost' 
+                ? 'http://localhost:4000/api/projects/generate' 
+                : '/api/projects/generate'; 
+
+            console.log("Calling Generation API:", API_URL);
+
+            const res = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -39,15 +48,27 @@ export default function CreateProjectPage() {
                 },
                 body: JSON.stringify({ topic, techStack: techStack.split(',').map(s=>s.trim()).filter(Boolean) })
             });
-            const data = await res.json();
-            if (data.success && data.projects) {
-                setGeneratedProjects(data.projects);
+
+            const contentType = res.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                const data = await res.json();
+                if (data.success && data.projects) {
+                    setGeneratedProjects(data.projects);
+                } else {
+                    alert(data.error || "Failed to generate ideas");
+                }
             } else {
-                alert(data.error || "Failed to generate ideas");
+                const text = await res.text();
+                console.error("Non-JSON API Response:", text);
+                if (res.status === 504) {
+                     alert("AI Generation Timed Out. Please try again or use a simpler prompt.");
+                } else {
+                     alert(`Server Error (${res.status}): ${text.substring(0, 100)}`);
+                }
             }
         } catch (e) {
-            console.error(e);
-            alert("Error generating projects");
+            console.error("Network/Parsing Error:", e);
+            alert("Error generating projects. Check console for details.");
         } finally {
             setLoading(false);
         }
@@ -137,8 +158,20 @@ export default function CreateProjectPage() {
                     </TabsList>
 
                     <TabsContent value="ai" className="space-y-8">
-                        <div className="grid gap-8 lg:grid-cols-5">
+                        <div className="grid gap-8 lg:col-span-5">
                             {/* Input Section */}
+              {/* Header */}
+            <div className="flex flex-col items-center text-center space-y-4 mb-12">
+                <Badge variant="outline" className="px-4 py-1 text-sm border-plasma-cyan/30 text-plasma-cyan bg-plasma-cyan/5 tracking-widest uppercase">
+                     <BrainCircuit className="w-4 h-4 mr-2" /> Research Engine Active
+                </Badge>
+                <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white uppercase font-heading">
+                    Project <span className="text-transparent bg-clip-text bg-gradient-to-r from-plasma-cyan to-nebula-purple">Architect</span>
+                </h1>
+                <p className="text-slate-400 max-w-xl text-lg font-light leading-relaxed">
+                    Enter a problem statement or rough idea. AI will perform deep research and generate a professional execution roadmap.
+                </p>
+            </div>
                             <div className="lg:col-span-2 space-y-6">
                                 <HolographicCard className="rounded-xl p-6 border-l-4 border-l-plasma-cyan">
                                     <div className="mb-6">
@@ -150,31 +183,32 @@ export default function CreateProjectPage() {
                                     
                                     <div className="space-y-6">
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Topic / Domain</Label>
-                                            <Input 
-                                                placeholder="e.g. Orbital Mechanics, React.js" 
+                                            <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Project Idea / Problem Statement</Label>
+                                            <Textarea 
+                                                placeholder="e.g. A decentralized voting system for local communities using Blockchain..." 
                                                 value={topic}
                                                 onChange={(e) => setTopic(e.target.value)}
-                                                className="bg-black/30 border-white/10 focus:border-plasma-cyan/50 text-white placeholder-slate-600 h-12"
+                                                className="bg-black/30 border-white/10 focus:border-plasma-cyan/50 text-white placeholder-slate-600 min-h-[100px] resize-none"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Tech Stack (Optional)</Label>
+                                            <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Preferred Tech Stack (Optional)</Label>
                                             <Input 
-                                                placeholder="e.g. Next.js, Python" 
-                                                value={techStack}
-                                                onChange={(e) => setTechStack(e.target.value)}
+                                                placeholder="e.g. Next.js, Python" value={techStack} onChange={(e) => setTechStack(e.target.value)}
                                                 className="bg-black/30 border-white/10 focus:border-plasma-cyan/50 text-white placeholder-slate-600 h-12"
                                             />
                                         </div>
                                         <NeonButton 
-                                            className="w-full h-12 text-base font-bold"
-                                            onClick={handleGenerate}
-                                            disabled={loading || !topic}
-                                            variant="primary"
+                                            variant="primary" 
+                                            className="w-full h-14 text-lg font-bold tracking-widest uppercase shadow-xl shadow-plasma-cyan/20 group"
+                                            onClick={handleGenerate} // Changed back to handleGenerate without argument
+                                            disabled={loading || !topic} // Changed back to original disabled condition
                                         >
-                                            {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Rocket className="mr-2 h-5 w-5" />}
-                                            Generate Concepts
+                                            {loading ? (
+                                                <><Loader2 className="mr-2 h-5 w-5 animate-spin"/> MAPPING TRAJECTORY...</> 
+                                            ) : (
+                                                <><Sparkles className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform"/> Initiate Deep Research</>
+                                            )}
                                         </NeonButton>
                                     </div>
                                 </HolographicCard>
@@ -213,7 +247,7 @@ export default function CreateProjectPage() {
                                     {generatedProjects.length > 0 && !loading && (
                                         <div className="grid gap-4">
                                             <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">Calculated Trajectories</h3>
-                                            {generatedProjects.map((proj, i) => (
+                                    {generatedProjects.map((proj, i) => (
                                                 <motion.div
                                                     key={i}
                                                     initial={{ opacity: 0, x: 20 }}
@@ -222,7 +256,7 @@ export default function CreateProjectPage() {
                                                 >
                                                     <div 
                                                         className="glass-panel rounded-xl p-6 hover:bg-white/5 cursor-pointer group relative overflow-hidden transition-all border border-white/5 hover:border-plasma-cyan/30"
-                                                        onClick={() => handleSaveGenerated(proj)}
+                                                        onClick={() => router.push(`/projects/${proj.id}?id=${proj.id}&title=${encodeURIComponent(proj.title)}`)}
                                                     >
                                                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-plasma-cyan to-nebula-purple opacity-50 group-hover:opacity-100 transition-opacity" />
                                                         
@@ -231,7 +265,7 @@ export default function CreateProjectPage() {
                                                             <span className="text-[10px] font-bold bg-white/10 px-2 py-1 rounded text-plasma-cyan border border-white/10 uppercase">{proj.difficulty || 'Intermediate'}</span>
                                                         </div>
                                                         
-                                                        <p className="text-sm text-slate-400 line-clamp-2 mb-4 pl-4 font-mono leading-relaxed">
+                                                        <p className="text-sm text-slate-400 line-clamp-3 mb-4 pl-4 font-mono leading-relaxed">
                                                             {proj.description}
                                                         </p>
                                                         

@@ -31,6 +31,44 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Get single project by ID
+router.get('/:id', async (req, res) => {
+    try {
+        const userId = req.headers['x-user-id'];
+        const { id } = req.params;
+
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        const userProject = await prisma.userProject.findFirst({
+            where: { userId, projectId: id },
+            include: { project: true }
+        });
+
+        if (!userProject) {
+            return res.status(404).json({ success: false, error: 'Project not found' });
+        }
+
+        // Parse repoStats and roadmap
+        const repoStats = userProject.repoStats ? JSON.parse(userProject.repoStats) : {};
+        let roadmap = [];
+        try {
+            roadmap = JSON.parse(userProject.project.roadmap || "[]");
+        } catch (e) {}
+
+        const result = {
+            ...userProject.project,
+            ...userProject,
+            roadmap,
+            repoStats
+        };
+
+        res.json({ success: true, project: result });
+    } catch (error) {
+        console.error("Fetch Project Error:", error);
+        res.status(500).json({ success: false, error: "Failed to fetch project" });
+    }
+});
+
 // Generate projects for a specific topic
 router.post('/generate', async (req, res) => {
     try {
@@ -41,33 +79,36 @@ router.post('/generate', async (req, res) => {
         }
 
         // Call AI
-        console.log(`[DEBUG] Generating projects for topic: ${topic}`);
+        console.log(`[DEBUG] Generating research roadmap for idea: ${topic}`);
         let projectsData = [];
         try {
-            // Using default stack if none provided to ensure AI has context
-            const stack = (techStack && techStack.length > 0) ? techStack : ['React', 'Node.js', 'PostgreSQL'];
-            const aiResponse = await aiService.generateProjectIdeas(topic, stack);
+            // New "Deep Research" Flow
+            const aiResponse = await aiService.generateResearchRoadmap(topic);
 
-            if (aiResponse && Array.isArray(aiResponse.projects)) {
-                projectsData = aiResponse.projects;
+            if (aiResponse && (aiResponse.title || aiResponse.projects)) {
+                // Handle if AI returns single object or array (prompt asks for single really, but let's be safe)
+                if (aiResponse.title) {
+                    projectsData = [aiResponse];
+                } else if (Array.isArray(aiResponse.projects)) {
+                    projectsData = aiResponse.projects;
+                }
             } else {
                  throw new Error("Invalid AI response format");
             }
 
         } catch (aiError) {
              console.error("AI Service Error:", aiError);
-             return res.status(500).json({ success: false, error: 'AI Generation Failed' });
+             return res.status(500).json({ success: false, error: 'AI Generation Failed: ' + aiError.message });
         }
 
         // Normalize
-        // The AI might wrap it in { projects: [...] } or just return [...]
-        // Process projects safely
         const processedProjects = projectsData.map(p => ({
             title: p.title || "Untitled Project",
             description: p.description || "No description provided.",
-            difficulty: p.difficulty || "BEGINNER",
-            techStack: p.techStack || "",
-            roadmap: typeof p.roadmap === 'object' ? JSON.stringify(p.roadmap) : p.roadmap || "[]"
+            difficulty: p.difficulty || "Intermediate",
+            techStack: typeof p.techStack === 'object' ? p.techStack.join(', ') : (p.techStack || ""),
+            roadmap: typeof p.roadmap === 'object' ? JSON.stringify(p.roadmap) : p.roadmap || "[]",
+            repoStats: p.repoStats // Preserve this for UserProject
         }));
 
         // PERSISTENCE: Save to DB
@@ -76,7 +117,6 @@ router.post('/generate', async (req, res) => {
 
         const savedProjects = [];
 
-        // Save sequentially or in parallel - sequential is safer for SQLite/Prisma locks sometimes
         for (const p of processedProjects) {
             try {
                 const project = await prisma.project.create({
@@ -85,26 +125,25 @@ router.post('/generate', async (req, res) => {
                         description: p.description,
                         difficulty: p.difficulty,
                         techStack: p.techStack,
-                        roadmap: p.roadmap,
-                        // topicId: topicId || null 
+                        roadmap: p.roadmap
                     }
                 });
 
                 if (userId) {
-                    // Check user exists first to be safe
                     const userExists = await prisma.user.findUnique({ where: { id: userId } });
                     if (userExists) {
                         try {
+                            // Merge the AI's deep research metadata into repoStats
+                            const stats = p.repoStats || {};
+                            stats.completedStepIds = []; // Initialize empty progress tracker
+
                             await prisma.userProject.create({
                                 data: {
                                     userId: userId,
                                     projectId: project.id,
-                                    status: 'SUGGESTED',
-                                    repoStats: JSON.stringify({
-                                        whyThisMatchesTheSyllabus: "N/A - Generated via Topic",
-                                        coreConceptsUsed: [],
-                                        projectScope: p.description
-                                    })
+                                    status: 'TODO', // Start as TODO
+                                    projectType: 'Research-Based',
+                                    repoStats: JSON.stringify(stats)
                                 }
                             });
                         } catch (linkError) {
@@ -238,7 +277,7 @@ router.put('/:id', async (req, res) => {
         const { id } = req.params;
         const { 
             title, description, techStack, skills, difficulty,
-            projectType, liveDemoLink, keyLearnings, duration, repoLink
+            projectType, liveDemoLink, keyLearnings, duration, repoLink, repoStats
         } = req.body;
 
         // Check ownership
@@ -268,7 +307,8 @@ router.put('/:id', async (req, res) => {
                 liveDemoLink,
                 keyLearnings,
                 duration,
-                repoLink
+                repoLink,
+                repoStats: repoStats ? JSON.stringify(repoStats) : undefined
             },
             include: { project: true }
         });
