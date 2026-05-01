@@ -83,13 +83,13 @@ export default function PortfolioPage() {
     if (loading) return (
         <DashboardLayout title="Holodeck Preview">
             <div className="flex h-[80vh] items-center justify-center flex-col gap-4">
-                <Loader2 className="w-12 h-12 animate-spin text-plasma-cyan" />
-                <div className="text-xs font-mono text-plasma-cyan uppercase tracking-widest animate-pulse">Rendering Holodeck Environment...</div>
+                <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                <div className="text-xs font-mono text-primary uppercase tracking-widest animate-pulse">Rendering Holodeck Environment...</div>
             </div>
         </DashboardLayout>
     );
 
-    if (!data) return <DashboardLayout title="Holodeck Preview"><div className="p-8 text-center text-slate-500">Failed to initialize environment.</div></DashboardLayout>;
+    if (!data) return <DashboardLayout title="Holodeck Preview"><div className="p-8 text-center text-muted-foreground">Failed to initialize environment.</div></DashboardLayout>;
 
     const { portfolio, certificates, user } = data;
 
@@ -135,22 +135,22 @@ export default function PortfolioPage() {
                     className="relative flex flex-col md:flex-row items-center gap-12 py-12 md:py-20"
                 >
                     {/* Holograhic Glow Background */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cosmic-indigo/30 rounded-full blur-[120px] -z-10 animate-pulse-glow" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/30 rounded-full blur-[120px] -z-10 animate-pulse-glow" />
 
                     <div className="flex-1 space-y-6 text-center md:text-left relative z-10">
-                        <div className="inline-flex items-center rounded-full border border-plasma-cyan/30 bg-plasma-cyan/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-plasma-cyan backdrop-blur-sm shadow-[0_0_15px_rgba(34,211,238,0.2)]">
-                            <span className="flex h-2 w-2 rounded-full bg-plasma-cyan mr-3 animate-pulse shadow-[0_0_10px_#22D3EE]"></span> Open For Deployment
+                        <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary  shadow-[0_0_15px_rgba(34,211,238,0.2)]">
+                            <span className="flex h-2 w-2 rounded-full bg-primary mr-3 animate-pulse shadow-[0_0_10px_#22D3EE]"></span> Open For Deployment
                         </div>
                         
                         <h1 className="text-5xl md:text-8xl font-heading font-black tracking-tight text-white leading-tight uppercase drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-plasma-cyan to-nebula-purple">{user.name || "Pilot"}</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-primary to-nebula-purple">{user.name || "Pilot"}</span>
                         </h1>
                         
                         <h2 className="text-2xl md:text-3xl text-slate-300 font-mono tracking-wider uppercase">
                             {portfolio.jobTitle || "Full Stack Engineer"}
                         </h2>
                         
-                        <p className="max-w-xl text-lg text-slate-400 leading-relaxed mx-auto md:mx-0 font-light border-l-2 border-plasma-cyan/20 pl-6">
+                        <p className="max-w-xl text-lg text-muted-foreground leading-relaxed mx-auto md:mx-0 font-light border-l-2 border-primary/20 pl-6">
                             {portfolio.bio || "Crafting advanced digital systems. Specializing in high-performance architectures and AI integration vectors."}
                         </p>
                         
@@ -158,15 +158,15 @@ export default function PortfolioPage() {
                             <NeonButton size="lg" onClick={() => window.open('/resume', '_blank')} variant="primary">
                                 View Service Log <ArrowRight className="ml-2 h-4 w-4" />
                             </NeonButton>
-                            <NeonButton size="lg" variant="ghost" className="text-plasma-cyan border-plasma-cyan/30 hover:bg-plasma-cyan/10">
+                            <NeonButton size="lg" variant="ghost" className="text-primary border-primary/30 hover:bg-primary/10">
                                 <Mail className="mr-2 h-4 w-4" /> Open Comms
                             </NeonButton>
                         </div>
                     </div>
 
                     <div className="relative group">
-                         <div className="absolute -inset-2 bg-gradient-to-r from-plasma-cyan via-white to-nebula-purple rounded-full opacity-30 group-hover:opacity-60 blur-xl transition duration-500 animate-spin-slow"></div>
-                        <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full bg-black flex items-center justify-center border-4 border-white/10 shrink-0 overflow-hidden z-10">
+                         <div className="absolute -inset-2 bg-gradient-to-r from-primary via-white to-nebula-purple rounded-full opacity-30 group-hover:opacity-60 blur-xl transition duration-500 animate-spin-slow"></div>
+                        <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full bg-black flex items-center justify-center border-4 border-border shrink-0 overflow-hidden z-10">
                             <Avatar className="w-full h-full">
                                 <AvatarImage src={user.image} alt={user.name} className="object-cover transition-transform duration-700 group-hover:scale-105" />
                                 <AvatarFallback className="text-6xl font-bold text-slate-700 bg-space-black">{user.name ? user.name[0] : "Me"}</AvatarFallback>
@@ -189,11 +189,11 @@ export default function PortfolioPage() {
                         <div className="h-px bg-gradient-to-r from-white/20 to-transparent flex-1" />
                     </div>
                     
-                    <HolographicCard className="p-8 border-t border-white/20">
+                    <HolographicCard className="p-8 border-t border-border">
                         <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                             {(portfolio.skills || "React, Node.js, JavaScript, TypeScript, Tailwind CSS, PostgreSQL, Git, Docker, AWS").split(',').map((skill, i) => (
                                 <motion.div key={i} variants={item}>
-                                    <div className="px-5 py-2.5 text-sm font-bold bg-white/5 hover:bg-white/10 text-plasma-cyan border border-plasma-cyan/30 rounded shadow-[0_0_10px_rgba(34,211,238,0.1)] uppercase tracking-wider backdrop-blur-md transition-all hover:scale-105 cursor-default">
+                                    <div className="px-5 py-2.5 text-sm font-bold bg-muted hover:bg-muted text-primary border border-primary/30 rounded shadow-[0_0_10px_rgba(34,211,238,0.1)] uppercase tracking-wider  transition-all hover:scale-105 cursor-default">
                                         {skill.trim()}
                                     </div>
                                 </motion.div>
@@ -204,26 +204,26 @@ export default function PortfolioPage() {
 
                 {/* PROJECTS GALLERY */}
                 <section className="space-y-10">
-                    <div className="flex items-end justify-between border-b border-white/10 pb-4">
+                    <div className="flex items-end justify-between border-b border-border pb-4">
                         <div>
                             <h3 className="text-3xl font-heading font-bold tracking-widest uppercase text-white flex items-center gap-3">
                                 <Code2 className="h-6 w-6 text-nebula-purple" /> 
                                 Project Archives
                             </h3>
-                            <p className="text-slate-500 mt-1 font-mono text-xs uppercase tracking-wider">Deployments: {projects.length}</p>
+                            <p className="text-muted-foreground mt-1 font-mono text-xs uppercase tracking-wider">Deployments: {projects.length}</p>
                         </div>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {loading && <div className="col-span-2 text-center py-20"><Loader2 className="w-8 h-8 animate-spin mx-auto text-plasma-cyan" /></div>}
+                        {loading && <div className="col-span-2 text-center py-20"><Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" /></div>}
                         
                         {!loading && projects.length === 0 && (
                             <HolographicCard className="col-span-2 text-center py-20 flex flex-col items-center">
-                                <div className="p-4 rounded-full bg-white/5 mb-4 border border-white/5">
-                                    <Code2 className="w-12 h-12 text-slate-500" />
+                                <div className="p-4 rounded-full bg-muted mb-4 border border-border">
+                                    <Code2 className="w-12 h-12 text-muted-foreground" />
                                 </div>
                                 <h3 className="text-xl font-bold text-white uppercase tracking-wider">Archive Empty</h3>
-                                <p className="text-slate-400 font-mono text-sm mt-2">Initialize new projects to populate the gallery.</p>
+                                <p className="text-muted-foreground font-mono text-sm mt-2">Initialize new projects to populate the gallery.</p>
                             </HolographicCard>
                         )}
 
@@ -235,26 +235,26 @@ export default function PortfolioPage() {
                                 transition={{ duration: 0.5, delay: idx * 0.1 }}
                                 viewport={{ once: true }}
                             >
-                                <HolographicCard className="h-full flex flex-col p-8 group border-transparent hover:border-plasma-cyan/50">
+                                <HolographicCard className="h-full flex flex-col p-8 group border-transparent hover:border-primary/50">
                                     <div className="flex justify-between items-start mb-6">
                                         <div className="space-y-1">
-                                            <span className="text-[10px] font-bold text-plasma-cyan uppercase tracking-widest bg-plasma-cyan/10 px-2 py-1 rounded border border-plasma-cyan/20">
-                                                {project.projectType || "Personal Mission"}
+                                            <span className="text-[10px] font-bold text-primary uppercase tracking-widest bg-primary/10 px-2 py-1 rounded border border-primary/20">
+                                                {project.projectType || "Personal Project"}
                                             </span>
-                                            <h3 className="text-2xl font-bold text-white group-hover:text-plasma-cyan transition-colors font-heading tracking-wide mt-2">{project.title}</h3>
+                                            <h3 className="text-2xl font-bold text-white group-hover:text-primary transition-colors font-heading tracking-wide mt-2">{project.title}</h3>
                                         </div>
                                         <button className="h-8 w-8 text-slate-600 hover:text-red-400 transition-colors" onClick={() => handleDeleteProject(project.id)}>
                                             <Trash2 className="h-4 w-4" />
                                         </button>
                                     </div>
                                     
-                                    <p className="text-slate-400 line-clamp-3 text-sm leading-relaxed mb-6 flex-1 font-light border-l border-white/10 pl-4">
+                                    <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed mb-6 flex-1 font-light border-l border-border pl-4">
                                         {project.description}
                                     </p>
                                     
                                     <div className="flex flex-wrap gap-2 mb-6">
                                         {project.techStack && (String(project.techStack).split(',').slice(0, 4).map((t, i) => (
-                                            <span key={i} className="text-[10px] font-mono text-slate-300 bg-white/5 px-2 py-1 rounded border border-white/5">{t.trim()}</span>
+                                            <span key={i} className="text-[10px] font-mono text-slate-300 bg-muted px-2 py-1 rounded border border-border">{t.trim()}</span>
                                         )))}
                                     </div>
                                     
@@ -264,14 +264,14 @@ export default function PortfolioPage() {
                                         </div>
                                     )}
 
-                                    <div className="flex gap-4 pt-4 border-t border-white/5 mt-auto">
+                                    <div className="flex gap-4 pt-4 border-t border-border mt-auto">
                                         {project.repoLink && (
-                                            <a href={project.repoLink} target="_blank" rel="noreferrer" className="flex items-center text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-white transition-colors">
+                                            <a href={project.repoLink} target="_blank" rel="noreferrer" className="flex items-center text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-white transition-colors">
                                                 <Github className="mr-2 h-4 w-4" /> Source Data
                                             </a>
                                         )}
                                         {project.liveDemoLink && (
-                                            <a href={project.liveDemoLink} target="_blank" rel="noreferrer" className="flex items-center text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-white transition-colors">
+                                            <a href={project.liveDemoLink} target="_blank" rel="noreferrer" className="flex items-center text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-white transition-colors">
                                                 <ExternalLink className="mr-2 h-4 w-4" /> Live Uplink
                                             </a>
                                         )}
@@ -300,17 +300,17 @@ export default function PortfolioPage() {
                                     transition={{ delay: idx * 0.1 }}
                                     viewport={{ once: true }}
                                 >
-                                    <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-aurora-green/50 transition-colors shadow-sm cursor-pointer hover:shadow-[0_0_15px_rgba(45,212,191,0.2)] group backdrop-blur-sm">
+                                    <div className="flex items-center gap-4 p-4 rounded-xl bg-muted border border-border hover:border-aurora-green/50 transition-colors shadow-sm cursor-pointer hover:shadow-[0_0_15px_rgba(45,212,191,0.2)] group ">
                                         <div className="h-12 w-12 rounded-full bg-aurora-green/10 flex items-center justify-center shrink-0 border border-aurora-green/20 group-hover:scale-110 transition-transform">
                                             <Award className="h-6 w-6 text-aurora-green" />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <h4 className="font-bold text-sm text-white truncate group-hover:text-aurora-green transition-colors uppercase tracking-wide">{cert.title}</h4>
-                                            <p className="text-xs text-slate-400 font-mono">{cert.issuer}</p>
+                                            <p className="text-xs text-muted-foreground font-mono">{cert.issuer}</p>
                                             <p className="text-[10px] text-slate-600 mt-0.5 font-mono">{new Date(cert.issueDate).toLocaleDateString()}</p>
                                         </div>
                                         {cert.credentialUrl && (
-                                            <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="text-slate-500 hover:text-aurora-green transition-colors">
+                                            <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-aurora-green transition-colors">
                                                 <ExternalLink className="h-4 w-4" />
                                             </a>
                                         )}
@@ -322,15 +322,15 @@ export default function PortfolioPage() {
                 )}
 
                 {/* FOOTER */}
-                <footer className="text-center pt-20 border-t border-white/10 text-slate-500">
+                <footer className="text-center pt-20 border-t border-border text-muted-foreground">
                     <div className="flex justify-center gap-8 mb-8">
-                        <a href={portfolio.linkedinUrl || "#"} target="_blank" rel="noreferrer" className={`h-12 w-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-plasma-cyan hover:text-black hover:shadow-[0_0_20px_rgba(34,211,238,0.5)] transition-all ${!portfolio.linkedinUrl && 'opacity-50 pointer-events-none'}`}>
+                        <a href={portfolio.linkedinUrl || "#"} target="_blank" rel="noreferrer" className={`h-12 w-12 flex items-center justify-center rounded-full bg-muted hover:bg-primary hover:text-black hover:shadow-[0_0_20px_rgba(34,211,238,0.5)] transition-all ${!portfolio.linkedinUrl && 'opacity-50 pointer-events-none'}`}>
                             <Linkedin className="h-5 w-5" />
                         </a>
-                        <a href={portfolio.githubUrl || "#"} target="_blank" rel="noreferrer" className={`h-12 w-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-white hover:text-black hover:shadow-[0_0_20px_rgba(255,255,255,0.5)] transition-all ${!portfolio.githubUrl && 'opacity-50 pointer-events-none'}`}>
+                        <a href={portfolio.githubUrl || "#"} target="_blank" rel="noreferrer" className={`h-12 w-12 flex items-center justify-center rounded-full bg-muted hover:bg-white hover:text-black hover:shadow-[0_0_20px_rgba(255,255,255,0.5)] transition-all ${!portfolio.githubUrl && 'opacity-50 pointer-events-none'}`}>
                             <Github className="h-5 w-5" />
                         </a>
-                        <a href={`mailto:${user.email}`} className="h-12 w-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-nebula-purple hover:text-white hover:shadow-[0_0_20px_rgba(109,40,217,0.5)] transition-all">
+                        <a href={`mailto:${user.email}`} className="h-12 w-12 flex items-center justify-center rounded-full bg-muted hover:bg-nebula-purple hover:text-white hover:shadow-[0_0_20px_rgba(109,40,217,0.5)] transition-all">
                              <Mail className="h-5 w-5" />
                         </a>
                     </div>

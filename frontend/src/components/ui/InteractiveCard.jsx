@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { MeshTransmissionMaterial, Text, Image, Html } from "@react-three/drei";
+import { MeshTransprojectMaterial, Text, Image, Html } from "@react-three/drei";
 import { useSpring, a } from "@react-spring/three";
 
 /**
@@ -33,11 +33,11 @@ export default function InteractiveCard({ title, subtitle, image, onClick }) {
       {/* Glass Layer */}
       <mesh position={[0, 0, 0.1]}>
         <boxGeometry args={[3, 4, 0.2]} />
-        <MeshTransmissionMaterial 
+        <MeshTransprojectMaterial 
           backside 
           thickness={0.2} 
           roughness={0.1} 
-          transmission={0.9} 
+          transproject={0.9} 
           ior={1.5} 
           chromaticAberration={0.06} 
           anisotropy={0.1}

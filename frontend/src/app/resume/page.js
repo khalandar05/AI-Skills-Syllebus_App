@@ -187,13 +187,13 @@ export default function ResumePage() {
                 )}
 
                 {!portfolio ? (
-                    <HolographicCard className="flex flex-col items-center justify-center py-24 text-center border-dashed border-white/10">
+                    <HolographicCard className="flex flex-col items-center justify-center py-24 text-center border-dashed border-border">
                         <div className="relative mb-8">
-                            <div className="absolute inset-0 bg-plasma-cyan/20 blur-xl rounded-full animate-pulse" />
-                            <FileText className="h-20 w-20 text-plasma-cyan relative z-10" />
+                            <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
+                            <FileText className="h-20 w-20 text-primary relative z-10" />
                         </div>
                         <h3 className="text-3xl font-heading font-bold mb-3 text-white uppercase tracking-widest">Resume Not Generated</h3>
-                        <p className="text-slate-400 max-w-md mx-auto mb-8 text-lg font-light leading-relaxed">
+                        <p className="text-muted-foreground max-w-md mx-auto mb-8 text-lg font-light leading-relaxed">
                             Use AI to compile your profile, skills, and projects into a professional resume.
                         </p>
                         <NeonButton onClick={handleGenerate} disabled={loading} size="lg">
@@ -206,16 +206,16 @@ export default function ResumePage() {
                         {/* Resume Header */}
                         <HolographicCard className="p-0 overflow-hidden group">
                             <div className="px-8 py-8 flex flex-col md:flex-row items-center gap-8 bg-black/40">
-                                <div className="h-32 w-32 relative rounded-full border-4 border-plasma-cyan shadow-[0_0_20px_rgba(34,211,238,0.3)] overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-500">
+                                <div className="h-32 w-32 relative rounded-full border-4 border-primary shadow-[0_0_20px_rgba(34,211,238,0.3)] overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-500">
                                         {user.image ? (
                                         <Image src={user.image} alt="Profile" fill className="object-cover" />
                                         ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-black text-4xl font-bold text-plasma-cyan">{user.name?.[0]}</div>
+                                        <div className="w-full h-full flex items-center justify-center bg-black text-4xl font-bold text-primary">{user.name?.[0]}</div>
                                         )}
                                 </div>
                                 <div className="flex-1 text-center md:text-left space-y-2">
                                     <h2 className="text-4xl font-heading font-black tracking-wider text-white uppercase">{user.name}</h2>
-                                    <p className="text-xl text-plasma-cyan font-mono tracking-widest uppercase">{portfolio.jobTitle || "Job Title"}</p>
+                                    <p className="text-xl text-primary font-mono tracking-widest uppercase">{portfolio.jobTitle || "Job Title"}</p>
                                 </div>
 
                                 <div className="flex gap-4">
@@ -243,18 +243,18 @@ export default function ResumePage() {
                                 {/* Sidebar Info */}
                             <div className="space-y-6">
                                 <HolographicCard className="p-6">
-                                    <div className="flex items-center gap-2 mb-4 text-plasma-cyan uppercase tracking-widest font-bold text-xs">
+                                    <div className="flex items-center gap-2 mb-4 text-primary uppercase tracking-widest font-bold text-xs">
                                         <Code2 className="h-4 w-4" /> Skills
                                     </div>
-                                    <p className="text-xs text-slate-500 mb-2">
+                                    <p className="text-xs text-muted-foreground mb-2">
                                         Derived from your projects and syllabus uploads.
                                     </p>
                                     <div className="flex flex-wrap gap-2">
                                         {portfolio.skills?.split(',').map((skill, i) => (
-                                            <span key={i} className="px-2 py-1 bg-white/5 border border-white/10 text-slate-300 text-xs rounded hover:border-plasma-cyan transition-colors cursor-default">
+                                            <span key={i} className="px-2 py-1 bg-muted border border-border text-slate-300 text-xs rounded hover:border-primary transition-colors cursor-default">
                                                 {skill.trim()}
                                             </span>
-                                        )) || <span className="text-slate-500 text-sm">No skills found.</span>}
+                                        )) || <span className="text-muted-foreground text-sm">No skills found.</span>}
                                     </div>
                                 </HolographicCard>
 
@@ -262,10 +262,10 @@ export default function ResumePage() {
                                     <div className="flex items-center gap-2 mb-4 text-white uppercase tracking-widest font-bold text-xs">
                                         <Share2 className="h-4 w-4" /> Contact
                                     </div>
-                                    <div className="p-3 rounded bg-white/5 border border-white/5 flex items-center gap-3">
-                                        <div className="h-8 w-8 rounded-full bg-plasma-cyan/20 flex items-center justify-center text-plasma-cyan font-bold">@</div>
+                                    <div className="p-3 rounded bg-muted border border-border flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">@</div>
                                         <div className="overflow-hidden">
-                                            <p className="text-[10px] text-slate-500 uppercase font-bold">Email</p>
+                                            <p className="text-[10px] text-muted-foreground uppercase font-bold">Email</p>
                                             <p className="text-sm text-white truncate font-mono">{user.email}</p>
                                         </div>
                                     </div>
@@ -279,26 +279,26 @@ export default function ResumePage() {
                                         </div>
                                         <Dialog open={isSectionDialogOpen} onOpenChange={setIsSectionDialogOpen}>
                                             <DialogTrigger asChild>
-                                                <button className="h-6 w-6 rounded-full bg-white/10 hover:bg-solar-gold hover:text-black flex items-center justify-center transition-colors">
+                                                <button className="h-6 w-6 rounded-full bg-muted hover:bg-solar-gold hover:text-black flex items-center justify-center transition-colors">
                                                     <Plus className="h-3 w-3" />
                                                 </button>
                                             </DialogTrigger>
-                                            <DialogContent className="bg-black/90 border-white/20 text-white backdrop-blur-md">
+                                            <DialogContent className="bg-black/90 border-border text-white ">
                                                 <DialogTitle className="uppercase tracking-widest text-solar-gold">Add Custom Section</DialogTitle>
                                                 <div className="space-y-4 py-4">
                                                     <div className="space-y-2">
-                                                        <label className="text-xs font-bold uppercase tracking-wide text-slate-500">Title</label>
+                                                        <label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Title</label>
                                                         <input 
-                                                            className="w-full p-3 bg-white/5 border border-white/10 rounded focus:border-solar-gold outline-none text-white" 
+                                                            className="w-full p-3 bg-muted border border-border rounded focus:border-solar-gold outline-none text-white" 
                                                             placeholder="e.g. Certifications"
                                                             value={newSection.title}
                                                             onChange={e => setNewSection({...newSection, title: e.target.value})}
                                                         />
                                                     </div>
                                                     <div className="space-y-2">
-                                                        <label className="text-xs font-bold uppercase tracking-wide text-slate-500">Content</label>
+                                                        <label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Content</label>
                                                         <textarea 
-                                                            className="w-full p-3 bg-white/5 border border-white/10 rounded focus:border-solar-gold outline-none text-white min-h-[120px]" 
+                                                            className="w-full p-3 bg-muted border border-border rounded focus:border-solar-gold outline-none text-white min-h-[120px]" 
                                                             placeholder="Enter details..."
                                                             value={newSection.content}
                                                             onChange={e => setNewSection({...newSection, content: e.target.value})}
@@ -311,14 +311,14 @@ export default function ResumePage() {
                                     </div>
                                     
                                     <div className="space-y-3">
-                                        {customSections.length === 0 && <p className="text-xs text-slate-500 italic text-center py-4 border border-dashed border-white/10 rounded">No custom sections.</p>}
+                                        {customSections.length === 0 && <p className="text-xs text-muted-foreground italic text-center py-4 border border-dashed border-border rounded">No custom sections.</p>}
                                         {customSections.map(section => (
-                                            <div key={section.id} className="group flex justify-between items-start p-3 bg-white/5 hover:bg-white/10 rounded transition-colors text-sm border border-transparent hover:border-solar-gold/30">
+                                            <div key={section.id} className="group flex justify-between items-start p-3 bg-muted hover:bg-muted rounded transition-colors text-sm border border-transparent hover:border-solar-gold/30">
                                                 <div>
                                                         <span className="font-bold block mb-1 text-white uppercase text-xs tracking-wider">{section.title}</span>
-                                                        <p className="text-xs text-slate-400 line-clamp-1">{section.content}</p>
+                                                        <p className="text-xs text-muted-foreground line-clamp-1">{section.content}</p>
                                                 </div>
-                                                <button className="text-slate-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDeleteSection(section.id)}>
+                                                <button className="text-muted-foreground hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDeleteSection(section.id)}>
                                                     <Trash2 className="h-3 w-3" />
                                                 </button>
                                             </div>
@@ -330,26 +330,26 @@ export default function ResumePage() {
                             {/* Main Content */}
                             <div className="md:col-span-2 space-y-6">
                                 <HolographicCard className="p-8">
-                                    <div className="flex flex-row items-center justify-between mb-6 pb-4 border-b border-white/10">
+                                    <div className="flex flex-row items-center justify-between mb-6 pb-4 border-b border-border">
                                             <h3 className="text-lg font-heading font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                                                <ScanLine className="h-5 w-5 text-plasma-cyan" /> Professional Summary
+                                                <ScanLine className="h-5 w-5 text-primary" /> Professional Summary
                                             </h3>
                                             <NeonButton variant="ghost" size="sm" onClick={copySummary} className="h-8 text-[10px]">
                                                 {copied ? <><CheckCircle2 className="w-3 h-3 mr-1" /> Copied</> : <><Copy className="w-3 h-3 mr-1" /> Copy Text</>}
                                             </NeonButton>
                                     </div>
-                                    <p className="text-slate-300 leading-relaxed font-light text-sm md:text-base border-l-2 border-plasma-cyan/30 pl-4">
+                                    <p className="text-slate-300 leading-relaxed font-light text-sm md:text-base border-l-2 border-primary/30 pl-4">
                                         {portfolio.summary}
                                     </p>
                                 </HolographicCard>
 
                                 <HolographicCard className="p-8">
-                                    <div className="mb-6 pb-4 border-b border-white/10">
+                                    <div className="mb-6 pb-4 border-b border-border">
                                         <h3 className="text-lg font-heading font-bold text-white uppercase tracking-widest flex items-center gap-2">
                                             <UserIcon className="h-5 w-5 text-nebula-purple" /> Biography
                                         </h3>
                                     </div>
-                                    <div className="bg-nebula-purple/5 p-6 rounded border border-nebula-purple/20 italic text-slate-400 leading-relaxed font-mono text-sm relative">
+                                    <div className="bg-nebula-purple/5 p-6 rounded border border-nebula-purple/20 italic text-muted-foreground leading-relaxed font-mono text-sm relative">
                                         <div className="absolute top-2 left-2 text-nebula-purple/40 text-4xl font-serif">"</div>
                                         {portfolio.bio}
                                         <div className="absolute bottom-[-10px] right-4 text-nebula-purple/40 text-4xl font-serif">"</div>
@@ -388,7 +388,7 @@ function ResumePreview({ user, portfolio, projects, customSections }) {
 
             {/* Summary */}
             <div className="mb-10">
-                <h2 className="text-xs font-black uppercase border-b border-slate-200 mb-4 text-slate-400 tracking-[0.2em] flex items-center gap-2">
+                <h2 className="text-xs font-black uppercase border-b border-slate-200 mb-4 text-muted-foreground tracking-[0.2em] flex items-center gap-2">
                     Professional Profile
                 </h2>
                 <p className="text-slate-700 leading-loose text-sm text-justify font-medium">{portfolio.summary}</p>
@@ -396,7 +396,7 @@ function ResumePreview({ user, portfolio, projects, customSections }) {
 
             {/* Skills */}
             <div className="mb-10">
-                <h2 className="text-xs font-black uppercase border-b border-slate-200 mb-4 text-slate-400 tracking-[0.2em] flex items-center gap-2">
+                <h2 className="text-xs font-black uppercase border-b border-slate-200 mb-4 text-muted-foreground tracking-[0.2em] flex items-center gap-2">
                     Technical Skills
                 </h2>
                 <div className="w-full">
@@ -406,7 +406,7 @@ function ResumePreview({ user, portfolio, projects, customSections }) {
 
             {/* Projects */}
             <div className="mb-10">
-                <h2 className="text-xs font-black uppercase border-b border-slate-200 mb-6 text-slate-400 tracking-[0.2em] flex items-center gap-2">
+                <h2 className="text-xs font-black uppercase border-b border-slate-200 mb-6 text-muted-foreground tracking-[0.2em] flex items-center gap-2">
                     Projects
                 </h2>
                 <div className="grid gap-8">
@@ -414,10 +414,10 @@ function ResumePreview({ user, portfolio, projects, customSections }) {
                         <div key={i} className="">
                             <div className="flex justify-between items-baseline mb-2">
                                 <h3 className="font-bold text-lg text-slate-900">{p.title}</h3>
-                                {p.difficulty && <span className="text-[10px] uppercase font-bold text-slate-500 border border-slate-200 px-2 py-0.5 rounded">{p.difficulty}</span>}
+                                {p.difficulty && <span className="text-[10px] uppercase font-bold text-muted-foreground border border-slate-200 px-2 py-0.5 rounded">{p.difficulty}</span>}
                             </div>
                             <p className="text-slate-600 text-sm mb-2 leading-relaxed">{p.description}</p>
-                            <p className="text-xs text-slate-500 font-mono">
+                            <p className="text-xs text-muted-foreground font-mono">
                                 <span className="font-bold text-slate-700">Stack:</span> {Array.isArray(p.techStack) ? p.techStack.join(', ') : p.techStack}
                             </p>
                         </div>
@@ -428,7 +428,7 @@ function ResumePreview({ user, portfolio, projects, customSections }) {
             {/* Custom Sections */}
              {customSections && customSections.map((section, idx) => (
                 <div key={idx} className="mb-10">
-                    <h2 className="text-xs font-black uppercase border-b border-slate-200 mb-4 text-slate-400 tracking-[0.2em] flex items-center gap-2">
+                    <h2 className="text-xs font-black uppercase border-b border-slate-200 mb-4 text-muted-foreground tracking-[0.2em] flex items-center gap-2">
                         {section.title}
                     </h2>
                     <div className="text-slate-700 text-sm whitespace-pre-wrap leading-relaxed">

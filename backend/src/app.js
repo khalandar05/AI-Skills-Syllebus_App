@@ -1,3 +1,4 @@
+require('express-async-errors'); // Async error safety (no crashes)
 const express = require('express'); // Restart trigger
 const cors = require('cors');
 
@@ -23,6 +24,7 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const path = require('path');
 
 const authMiddleware = require('./middleware/authMiddleware');
+const errorHandler = require('./middleware/errorHandler');
 
 app.use('/api/projects', authMiddleware, projectRoutes);
 app.use('/api/portfolio', authMiddleware, portfolioRoutes);
@@ -44,21 +46,6 @@ app.get('/', (req, res) => {
 });
 
 // Global Error Handler - LAST Middleware
-app.use((err, req, res, next) => {
-    console.error("🔥 Global Error Handler Caught:", err);
-    if (res.headersSent) {
-        return next(err);
-    }
-    
-    // Ensure we always return JSON, even for weird errors
-    const errorMessage = err.message || (typeof err === 'string' ? err : "Unknown Internal Server Error");
-    const errorDetails = process.env.NODE_ENV === 'development' ? err.stack : undefined;
-
-    res.status(err.status || 500).json({
-        success: false,
-        error: errorMessage,
-        details: errorDetails
-    });
-});
+app.use(errorHandler);
 
 module.exports = app;

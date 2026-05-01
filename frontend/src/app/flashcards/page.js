@@ -130,23 +130,23 @@ export default function FlashcardsPage() {
                             <h1 className="text-5xl md:text-6xl font-heading font-black tracking-widest text-white uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
                                 Knowledge Injection
                             </h1>
-                            <p className="text-plasma-cyan font-mono text-lg max-w-lg mx-auto tracking-wide uppercase">
+                            <p className="text-primary font-mono text-lg max-w-lg mx-auto tracking-wide uppercase">
                                 Upload source material for rapid neural synthesis.
                             </p>
                         </div>
 
                         <div className="w-full max-w-xl">
-                             <div className="group relative flex flex-col items-center justify-center border-2 border-dashed border-white/20 rounded-3xl p-12 hover:bg-white/5 hover:border-plasma-cyan transition-all cursor-pointer bg-black/40 backdrop-blur-md overflow-hidden">
+                             <div className="group relative flex flex-col items-center justify-center border-2 border-dashed border-border rounded-3xl p-12 hover:bg-muted hover:border-primary transition-all cursor-pointer bg-black/40  overflow-hidden">
                                 <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10 mix-blend-overlay" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-plasma-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                 
                                 <label className="cursor-pointer flex flex-col items-center gap-6 w-full z-10">
-                                    <div className="p-6 bg-black/50 border border-white/10 rounded-full group-hover:scale-110 group-hover:border-plasma-cyan transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
-                                        <Upload className="w-10 h-10 text-plasma-cyan" />
+                                    <div className="p-6 bg-black/50 border border-border rounded-full group-hover:scale-110 group-hover:border-primary transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+                                        <Upload className="w-10 h-10 text-primary" />
                                     </div>
                                     <div className="text-center">
                                         <p className="font-bold text-xl text-white font-heading uppercase tracking-wide">Drop Data Packet</p>
-                                        <p className="text-sm text-slate-400 mt-2 font-mono">PDF Format Only</p>
+                                        <p className="text-sm text-muted-foreground mt-2 font-mono">PDF Format Only</p>
                                     </div>
                                     <input 
                                         type="file" 
@@ -158,9 +158,9 @@ export default function FlashcardsPage() {
                             </div>
                             
                             {file && (
-                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-6 flex items-center justify-between bg-white/5 p-4 rounded-xl border border-plasma-cyan/30 shadow-[0_0_15px_rgba(34,211,238,0.1)]">
+                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-6 flex items-center justify-between bg-muted p-4 rounded-xl border border-primary/30 shadow-[0_0_15px_rgba(34,211,238,0.1)]">
                                     <div className="flex items-center gap-3 overflow-hidden">
-                                        <div className="p-2 bg-plasma-cyan/10 rounded-lg border border-plasma-cyan/20"><FileText className="w-4 h-4 text-plasma-cyan" /></div>
+                                        <div className="p-2 bg-primary/10 rounded-lg border border-primary/20"><FileText className="w-4 h-4 text-primary" /></div>
                                         <span className="text-sm font-bold text-white truncate font-mono">{file.name}</span>
                                     </div>
                                     <NeonButton size="sm" onClick={handleGenerate} variant="primary">
@@ -188,7 +188,7 @@ export default function FlashcardsPage() {
                         </div>
                         <div className="text-center space-y-2">
                              <h3 className="text-3xl font-black font-heading text-white uppercase tracking-widest animate-pulse">Processing Data</h3>
-                             <p className="text-plasma-cyan font-mono text-sm uppercase">Synthesizing neural pathways...</p>
+                             <p className="text-primary font-mono text-sm uppercase">Synthesizing neural pathways...</p>
                         </div>
                     </div>
                 )}
@@ -205,21 +205,21 @@ export default function FlashcardsPage() {
                                 <div>
                                     <h2 className="text-lg font-bold leading-none text-white font-heading uppercase tracking-wide">{deckData.topic || "Construct"}</h2>
                                     <div className="flex items-center gap-3 mt-2">
-                                        <div className="h-1.5 w-48 bg-white/10 rounded-full overflow-hidden">
+                                        <div className="h-1.5 w-48 bg-muted rounded-full overflow-hidden">
                                             <div 
-                                                className="h-full bg-plasma-cyan shadow-[0_0_10px_#22D3EE] transition-all duration-300" 
+                                                className="h-full bg-primary shadow-[0_0_10px_#22D3EE] transition-all duration-300" 
                                                 style={{ width: `${((currentIndex + 1) / shuffledCards.length) * 100}%` }} 
                                             />
                                         </div>
-                                        <p className="text-[10px] text-plasma-cyan font-mono font-bold">{currentIndex + 1} / {shuffledCards.length}</p>
+                                        <p className="text-[10px] text-primary font-mono font-bold">{currentIndex + 1} / {shuffledCards.length}</p>
                                     </div>
                                 </div>
                             </div>
                             <div className="flex gap-3">
-                                <button onClick={handleShuffle} className="h-10 w-10 rounded-full bg-white/5 hover:bg-plasma-cyan hover:text-black hover:scale-110 flex items-center justify-center transition-all border border-white/10">
+                                <button onClick={handleShuffle} className="h-10 w-10 rounded-full bg-muted hover:bg-primary hover:text-black hover:scale-110 flex items-center justify-center transition-all border border-border">
                                     <Shuffle className="w-4 h-4" />
                                 </button>
-                                <button onClick={() => { setDeckData(null); setFile(null); }} className="h-10 w-10 rounded-full bg-white/5 hover:bg-red-500 hover:text-white hover:scale-110 flex items-center justify-center transition-all border border-white/10">
+                                <button onClick={() => { setDeckData(null); setFile(null); }} className="h-10 w-10 rounded-full bg-muted hover:bg-red-500 hover:text-white hover:scale-110 flex items-center justify-center transition-all border border-border">
                                     <XCircle className="w-5 h-5" />
                                 </button>
                             </div>
@@ -236,12 +236,12 @@ export default function FlashcardsPage() {
                             >
                                 {/* FRONT */}
                                 <div className="absolute inset-0 backface-hidden w-full h-full">
-                                    <HolographicCard className="w-full h-full flex flex-col items-center justify-center p-12 text-center border-plasma-cyan/30 hover:border-plasma-cyan/60 transition-all bg-black/60 backdrop-blur-xl">
+                                    <HolographicCard className="w-full h-full flex flex-col items-center justify-center p-12 text-center border-primary/30 hover:border-primary/60 transition-all bg-black/60 ">
                                         <div className="absolute top-0 right-0 p-6 opacity-20">
-                                            <Dna className="w-24 h-24 text-plasma-cyan animate-pulse-slow" />
+                                            <Dna className="w-24 h-24 text-primary animate-pulse-slow" />
                                         </div>
                                         
-                                        <span className="absolute top-8 left-8 bg-plasma-cyan/10 border border-plasma-cyan/30 text-plasma-cyan uppercase tracking-widest text-[10px] font-bold px-3 py-1 rounded">
+                                        <span className="absolute top-8 left-8 bg-primary/10 border border-primary/30 text-primary uppercase tracking-widest text-[10px] font-bold px-3 py-1 rounded">
                                             {currentCard.category || "General Data"}
                                         </span>
                                         
@@ -249,7 +249,7 @@ export default function FlashcardsPage() {
                                             {currentCard.front}
                                         </h3>
                                         
-                                        <div className="absolute bottom-8 flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                                        <div className="absolute bottom-8 flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                                             <MoreHorizontal className="w-4 h-4 animate-pulse" /> Tap Neural Link
                                         </div>
                                     </HolographicCard>
@@ -260,7 +260,7 @@ export default function FlashcardsPage() {
                                     className="absolute inset-0 backface-hidden w-full h-full" 
                                     style={{ transform: "rotateY(180deg)" }}
                                 >
-                                    <HolographicCard className="w-full h-full flex flex-col items-center justify-center p-12 text-center border-nebula-purple/30 bg-black/80 backdrop-blur-xl">
+                                    <HolographicCard className="w-full h-full flex flex-col items-center justify-center p-12 text-center border-nebula-purple/30 bg-black/80 ">
                                         <div className="absolute inset-0 bg-nebula-purple/5 opacity-50" />
                                         <div className="prose prose-invert max-w-none text-xl md:text-2xl leading-relaxed font-light text-slate-100 relative z-10">
                                             {currentCard.back}
@@ -287,7 +287,7 @@ export default function FlashcardsPage() {
                                 Next <ArrowRight className="ml-2 h-4 w-4" />
                             </NeonButton>
                         </div>
-                        <p className="text-center text-[10px] text-slate-500 mt-8 font-mono uppercase tracking-widest">Neural Interface Active</p>
+                        <p className="text-center text-[10px] text-muted-foreground mt-8 font-mono uppercase tracking-widest">Neural Interface Active</p>
                     </div>
                 )}
             </div>

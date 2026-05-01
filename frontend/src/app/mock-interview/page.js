@@ -87,7 +87,7 @@ export default function MockInterviewPage() {
             if (data.success) {
                 setFeedback(data.evaluation);
             } else {
-                alert(data.error || "Submission rejected by mainframe.");
+                alert(data.error || "Subproject rejected by mainframe.");
             }
         } catch (e) {
             console.error(e);
@@ -191,7 +191,7 @@ export default function MockInterviewPage() {
     };
 
     const modules = [
-        { id: 'Technical', label: 'Technical', icon: BrainCircuit, color: 'text-plasma-cyan', desc: 'Core Systems Knowledge' },
+        { id: 'Technical', label: 'Technical', icon: BrainCircuit, color: 'text-primary', desc: 'Core Systems Knowledge' },
         { id: 'Aptitude', label: 'Aptitude', icon: Calculator, color: 'text-solar-gold', desc: 'Logic & Computation' },
         { id: 'DSA', label: 'Algorithms', icon: Code2, color: 'text-aurora-green', desc: 'Data Structure Optimization' },
         { id: 'HR', label: 'Behavioral', icon: Users, color: 'text-nebula-purple', desc: 'Crew Compatibility' },
@@ -206,11 +206,11 @@ export default function MockInterviewPage() {
                     <div className="max-w-4xl mx-auto space-y-12 py-12">
                         <div className="text-center space-y-4">
                             <div className="inline-flex relative">
-                                <div className="absolute inset-0 bg-plasma-cyan/30 blur-xl rounded-full animate-pulse-slow" />
-                                <BrainCircuit className="h-20 w-20 text-plasma-cyan relative z-10" />
+                                <div className="absolute inset-0 bg-primary/30 blur-xl rounded-full animate-pulse-slow" />
+                                <BrainCircuit className="h-20 w-20 text-primary relative z-10" />
                             </div>
                             <h1 className="text-5xl font-heading font-black tracking-widest text-white uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">Training Simulator</h1>
-                            <p className="text-plasma-cyan font-mono text-sm tracking-widest uppercase">
+                            <p className="text-primary font-mono text-sm tracking-widest uppercase">
                                 Initialize AI-driven interview scenarios tailored to your career trajectory.
                             </p>
                         </div>
@@ -223,23 +223,23 @@ export default function MockInterviewPage() {
                                     onClick={() => setInterviewType(m.id)}
                                     className={`relative cursor-pointer transition-all duration-300 group ${interviewType === m.id ? 'scale-105' : 'hover:scale-105 opacity-80 hover:opacity-100'}`}
                                 >
-                                    <HolographicCard className={`h-full flex flex-col items-center text-center p-6 border-2 ${interviewType === m.id ? 'border-plasma-cyan bg-plasma-cyan/5 shadow-[0_0_20px_rgba(34,211,238,0.2)]' : 'border-white/10 hover:border-white/30'}`}>
-                                        <div className={`p-4 rounded-full bg-white/5 mb-4 ${interviewType === m.id ? 'animate-pulse' : ''}`}>
+                                    <HolographicCard className={`h-full flex flex-col items-center text-center p-6 border-2 ${interviewType === m.id ? 'border-primary bg-primary/5 shadow-[0_0_20px_rgba(34,211,238,0.2)]' : 'border-border hover:border-white/30'}`}>
+                                        <div className={`p-4 rounded-full bg-muted mb-4 ${interviewType === m.id ? 'animate-pulse' : ''}`}>
                                             <m.icon className={`h-8 w-8 ${m.color}`} />
                                         </div>
                                         <div className="font-bold text-lg text-white font-heading uppercase tracking-wide">{m.label}</div>
-                                        <div className="text-[10px] text-slate-400 font-mono mt-2">{m.desc}</div>
+                                        <div className="text-[10px] text-muted-foreground font-mono mt-2">{m.desc}</div>
                                     </HolographicCard>
                                 </div>
                             ))}
                         </div>
 
                         {/* Config Panel */}
-                        <HolographicCard className="p-8 border-l-4 border-l-plasma-cyan">
+                        <HolographicCard className="p-8 border-l-4 border-l-primary">
                             <div className="grid md:grid-cols-3 gap-8 items-center">
                                 <div className="md:col-span-2 space-y-6">
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold tracking-widest uppercase text-plasma-cyan flex items-center gap-2">
+                                        <label className="text-xs font-bold tracking-widest uppercase text-primary flex items-center gap-2">
                                             <Activity className="h-4 w-4" /> Calibration Parameters
                                         </label>
                                         <Input 
@@ -251,7 +251,7 @@ export default function MockInterviewPage() {
                                             }
                                             value={context}
                                             onChange={(e) => setContext(e.target.value)}
-                                            className="h-14 bg-black/40 border-white/10 focus:border-plasma-cyan text-white text-lg font-mono placeholder:text-slate-600 rounded-none border-l-2 border-l-white/20"
+                                            className="h-14 bg-black/40 border-border focus:border-primary text-white text-lg font-mono placeholder:text-slate-600 rounded-none border-l-2 border-l-white/20"
                                         />
                                     </div>
                                     {hasSyllabus && (
@@ -290,21 +290,21 @@ export default function MockInterviewPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[600px]">
                         {/* Main Interface */}
                         <div className="lg:col-span-8 flex flex-col gap-6">
-                            <HolographicCard className="p-8 border-t-4 border-t-plasma-cyan relative overflow-hidden">
+                            <HolographicCard className="p-8 border-t-4 border-t-primary relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-4 opacity-20">
-                                    <Activity className="h-32 w-32 text-plasma-cyan" />
+                                    <Activity className="h-32 w-32 text-primary" />
                                 </div>
                                 
                                 <div className="flex justify-between items-center mb-6 relative z-10">
                                     <div className="flex items-center gap-3">
-                                        <span className="px-3 py-1 bg-plasma-cyan/10 border border-plasma-cyan/30 text-plasma-cyan text-xs font-bold tracking-widest uppercase rounded">
+                                        <span className="px-3 py-1 bg-primary/10 border border-primary/30 text-primary text-xs font-bold tracking-widest uppercase rounded">
                                             Seq {currentIndex + 1} / {session.questions.length}
                                         </span>
                                         <span className="flex items-center gap-2 text-[10px] text-red-400 font-bold uppercase tracking-widest animate-pulse">
                                             <div className="w-2 h-2 rounded-full bg-red-500" /> Live Feed
                                         </span>
                                     </div>
-                                    <Timer className="h-5 w-5 text-slate-500" />
+                                    <Timer className="h-5 w-5 text-muted-foreground" />
                                 </div>
                                 
                                 <h2 className="text-2xl md:text-3xl font-heading font-medium leading-relaxed text-white relative z-10">
@@ -313,10 +313,10 @@ export default function MockInterviewPage() {
                             </HolographicCard>
 
                             <div className="flex-1 relative flex flex-col">
-                                <div className="absolute -inset-1 bg-gradient-to-b from-plasma-cyan/20 to-transparent opacity-20 blur-sm rounded-xl pointer-events-none" />
+                                <div className="absolute -inset-1 bg-gradient-to-b from-primary/20 to-transparent opacity-20 blur-sm rounded-xl pointer-events-none" />
                                 <Textarea 
                                     placeholder="Input response data..." 
-                                    className="flex-1 text-lg p-6 bg-black/40 border-white/10 focus:border-plasma-cyan/50 text-white placeholder:text-slate-600 font-mono leading-relaxed rounded-xl resize-none min-h-[300px]"
+                                    className="flex-1 text-lg p-6 bg-black/40 border-border focus:border-primary/50 text-white placeholder:text-slate-600 font-mono leading-relaxed rounded-xl resize-none min-h-[300px]"
                                     value={answer}
                                     onChange={(e) => setAnswer(e.target.value)}
                                     disabled={loading || !!feedback}
@@ -324,7 +324,7 @@ export default function MockInterviewPage() {
                                 
                                 <div className="absolute top-4 right-4">
                                      <button 
-                                        className={`h-10 w-10 rounded-full flex items-center justify-center transition-all bg-black/50 border border-white/10 hover:border-plasma-cyan ${isListening ? 'text-red-500 border-red-500 animate-pulse' : 'text-slate-400'}`}
+                                        className={`h-10 w-10 rounded-full flex items-center justify-center transition-all bg-black/50 border border-border hover:border-primary ${isListening ? 'text-red-500 border-red-500 animate-pulse' : 'text-muted-foreground'}`}
                                         onClick={toggleVoiceInput}
                                         disabled={loading || !!feedback}
                                     >
@@ -367,7 +367,7 @@ export default function MockInterviewPage() {
                                         className="h-full"
                                     >
                                         <HolographicCard className="h-full flex flex-col border-emerald-500/30">
-                                            <div className="p-6 border-b border-white/10 flex justify-between items-center bg-emerald-500/5">
+                                            <div className="p-6 border-b border-border flex justify-between items-center bg-emerald-500/5">
                                                 <h3 className="font-heading font-bold text-white uppercase tracking-wider">Analysis Complete</h3>
                                                 <div className="px-3 py-1 bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30 rounded text-sm">
                                                     {feedback.score}%
@@ -395,12 +395,12 @@ export default function MockInterviewPage() {
                                                         ))}
                                                     </ul>
                                                 </div>
-                                                <div className="p-4 bg-white/5 border border-white/5 rounded italic text-slate-400 text-sm">
+                                                <div className="p-4 bg-muted border border-border rounded italic text-muted-foreground text-sm">
                                                     &quot;{feedback.feedback}&quot;
                                                 </div>
                                             </div>
 
-                                            <div className="p-6 border-t border-white/5">
+                                            <div className="p-6 border-t border-border">
                                                 <NeonButton className="w-full" onClick={nextQuestion}>
                                                     {currentIndex < session.questions.length - 1 ? "Next Sequence" : "End Simulation"} <ChevronRight className="ml-2 h-4 w-4" />
                                                 </NeonButton>
@@ -408,12 +408,12 @@ export default function MockInterviewPage() {
                                         </HolographicCard>
                                     </motion.div>
                                 ) : (
-                                    <HolographicCard className="h-full flex flex-col items-center justify-center text-center p-8 opacity-50 border-dashed border-white/10">
-                                        <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 animate-pulse">
-                                            <Radio className="h-8 w-8 text-slate-500" />
+                                    <HolographicCard className="h-full flex flex-col items-center justify-center text-center p-8 opacity-50 border-dashed border-border">
+                                        <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mb-6 animate-pulse">
+                                            <Radio className="h-8 w-8 text-muted-foreground" />
                                         </div>
                                         <h3 className="text-lg font-bold text-white uppercase tracking-widest mb-2">Awaiting Input</h3>
-                                        <p className="text-xs text-slate-500 font-mono">Transmission channel open.</p>
+                                        <p className="text-xs text-muted-foreground font-mono">Transproject channel open.</p>
                                     </HolographicCard>
                                 )}
                             </AnimatePresence>
@@ -423,30 +423,30 @@ export default function MockInterviewPage() {
                                 {explanation && (
                                     <motion.div 
                                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
-                                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 "
                                     >
-                                        <HolographicCard className="border-plasma-cyan/40 shadow-[0_0_30px_rgba(34,211,238,0.1)] bg-black/90 backdrop-blur-xl w-full max-w-2xl mx-auto">
-                                            <div className="p-4 flex items-center justify-between border-b border-white/10">
-                                                <div className="flex items-center gap-2 text-plasma-cyan font-bold text-xs uppercase tracking-widest">
+                                        <HolographicCard className="border-primary/40 shadow-[0_0_30px_rgba(34,211,238,0.1)] bg-black/90  w-full max-w-2xl mx-auto">
+                                            <div className="p-4 flex items-center justify-between border-b border-border">
+                                                <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
                                                     <Lightbulb className="h-4 w-4" /> Intel Database
                                                 </div>
                                                 <div className="flex gap-2">
-                                                    <button onClick={isSpeaking ? stopSpeaking : speakExplanation} className="text-plasma-cyan hover:text-white p-1">
+                                                    <button onClick={isSpeaking ? stopSpeaking : speakExplanation} className="text-primary hover:text-white p-1">
                                                         {isSpeaking ? <StopCircle className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
                                                     </button>
-                                                    <button onClick={() => { setExplanation(null); stopSpeaking(); }} className="text-slate-500 hover:text-white p-1">×</button>
+                                                    <button onClick={() => { setExplanation(null); stopSpeaking(); }} className="text-muted-foreground hover:text-white p-1">×</button>
                                                 </div>
                                             </div>
                                             <div className="p-6 text-sm text-slate-300 max-h-[60vh] overflow-y-auto custom-scrollbar space-y-4 font-light">
                                                 <p className="leading-relaxed">{explanation.explanation}</p>
                                                 
                                                 {explanation.codeSnippet && (
-                                                    <div className="relative group rounded-lg overflow-hidden border border-white/10 bg-black/50 mt-4">
-                                                        <div className="flex justify-between items-center px-4 py-2 bg-white/5 border-b border-white/5">
-                                                            <span className="text-[10px] uppercase font-bold text-slate-500">Code Reference</span>
+                                                    <div className="relative group rounded-lg overflow-hidden border border-border bg-black/50 mt-4">
+                                                        <div className="flex justify-between items-center px-4 py-2 bg-muted border-b border-border">
+                                                            <span className="text-[10px] uppercase font-bold text-muted-foreground">Code Reference</span>
                                                             <button 
                                                                 onClick={() => navigator.clipboard.writeText(explanation.codeSnippet)}
-                                                                className="text-xs text-plasma-cyan hover:text-white flex items-center gap-1 transition-colors"
+                                                                className="text-xs text-primary hover:text-white flex items-center gap-1 transition-colors"
                                                             >
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                                                                 Copy
@@ -458,9 +458,9 @@ export default function MockInterviewPage() {
                                                     </div>
                                                 )}
 
-                                                <div className="bg-white/5 p-4 rounded border border-white/5 mt-4">
-                                                    <span className="text-[10px] text-slate-500 uppercase font-bold block mb-2">Optimal Response Protocol</span>
-                                                    <p className="italic text-slate-400 leading-relaxed">&quot;{explanation.modelAnswer}&quot;</p>
+                                                <div className="bg-muted p-4 rounded border border-border mt-4">
+                                                    <span className="text-[10px] text-muted-foreground uppercase font-bold block mb-2">Optimal Response Protocol</span>
+                                                    <p className="italic text-muted-foreground leading-relaxed">&quot;{explanation.modelAnswer}&quot;</p>
                                                 </div>
                                             </div>
                                         </HolographicCard>
@@ -475,13 +475,13 @@ export default function MockInterviewPage() {
                 {completed && (
                     <div className="flex justify-center py-20">
                         <HolographicCard className="max-w-xl w-full text-center p-12 relative overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-b from-plasma-cyan/10 to-transparent opacity-50" />
+                            <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent opacity-50" />
                             <div className="relative z-10">
-                                <div className="inline-flex items-center justify-center p-8 bg-plasma-cyan/10 rounded-full text-plasma-cyan mb-8 border border-plasma-cyan/20 shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+                                <div className="inline-flex items-center justify-center p-8 bg-primary/10 rounded-full text-primary mb-8 border border-primary/20 shadow-[0_0_20px_rgba(34,211,238,0.3)]">
                                     <Award className="h-16 w-16" />
                                 </div>
                                 <h2 className="text-4xl font-heading font-black text-white uppercase tracking-widest mb-4">Simulation Complete</h2>
-                                <p className="text-slate-400 text-lg px-4 mb-8 font-light">
+                                <p className="text-muted-foreground text-lg px-4 mb-8 font-light">
                                     Data sequence successfully archived. Performance metrics have been logged.
                                 </p>
                                 <div className="flex flex-col sm:flex-row justify-center gap-4">

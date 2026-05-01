@@ -1,46 +1,84 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Outfit:wght@300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 @import "tailwindcss";
 @config "../../tailwind.config.js";
 
 @layer base {
   :root {
-    /* ANTI-GRAVITY SPACE THEME DEFAULT */
-    
-    /* Background: Deep Space Black */
-    --background: 231 67% 2%; /* #02030A */
-    --foreground: 210 40% 98%;
+    /* CLEAN SAAS THEME DEFAULT (LIGHT) */
+    --background: 210 20% 98%; /* #F9FAFB */
+    --foreground: 222.2 47.4% 11.2%; /* #111827 */
 
-    /* Card: Glass effect base - Semi Transparent */
-    --card: 233 37% 17%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 222.2 47.4% 11.2%;
 
-    --popover: 233 37% 17%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
 
-    /* Primary: Nebula Purple / Plasma Cyan mix */
-    --primary: 263 70% 50%; /* #6D28D9 */
+    /* Deep Indigo Primary */
+    --primary: 243 75% 59%; /* #4F46E5 */
     --primary-foreground: 210 40% 98%;
 
-    /* Secondary: Cosmic Indigo */
-    --secondary: 231 37% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-    --muted: 231 37% 17%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215 16% 47%; /* #6B7280 */
 
-    /* Accent: Plasma Cyan */
-    --accent: 186 86% 53%; /* #22D3EE */
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 243 80% 67%; /* #6366F1 */
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --success: 142 76% 36%; /* #16A34A */
+    --success-foreground: 210 40% 98%;
+
+    --warning: 38 92% 50%; /* #D97706 */
+    --warning-foreground: 210 40% 98%;
+
+    --destructive: 0 72% 51%; /* #DC2626 */
     --destructive-foreground: 210 40% 98%;
 
-    --border: 240 5% 26%;
-    --input: 240 5% 26%;
-    --ring: 263 70% 50%;
+    --border: 220 13% 91%; /* #E5E7EB */
+    --input: 220 13% 91%;
+    --ring: 243 75% 59%;
 
-    --radius: 1rem;
+    --radius: 0.75rem; /* 12px */
+  }
+
+  .dark {
+    /* CLEAN SAAS THEME (DARK) */
+    --background: 222.2 47.4% 11.2%; /* #0F172A */
+    --foreground: 210 40% 98%;
+
+    --card: 217.2 32.6% 17.5%; /* #111827 */
+    --card-foreground: 210 40% 98%;
+
+    --popover: 217.2 32.6% 17.5%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 243 75% 59%; /* #4F46E5 */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%; /* #9CA3AF */
+
+    --accent: 243 80% 67%; /* #6366F1 */
+    --accent-foreground: 210 40% 98%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 210 40% 98%;
+
+    --destructive: 0 72% 51%; /* #DC2626 */
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 215 28% 17%; /* #1F2937 */
+    --input: 215 28% 17%;
+    --ring: 243 75% 59%;
   }
 }
 
@@ -54,100 +92,31 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    /* Removing standard gradient - using 3D Canvas instead */
-    background-image: none;
-    font-family: 'Inter', sans-serif;
-    overflow-x: hidden; /* Prevent horizontal scroll from 3D elements */
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility; /* Ensure crisp text */
+    text-rendering: optimizeLegibility;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Outfit', sans-serif;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 600;
   }
-}
-
-/* 3D HOLOGRAPHIC UTILITIES */
-
-.glass-panel {
-  /* Increased opacity for better text contrast - "Ultra-HD" look */
-  background: rgba(13, 16, 33, 0.85); 
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.1); /* Sharper border */
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-  transition: all 0.3s ease;
-  will-change: transform, opacity;
-}
-
-/* For React Three Fiber Canvas z-index handling */
-#canvas-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -1; /* Behind everything */
-  pointer-events: none;
-}
-
-/* Holographic Card */
-.holo-card {
-  /* Semi-solid background for maximum readability */
-  background: linear-gradient(135deg, rgba(20, 24, 45, 0.9) 0%, rgba(20, 24, 45, 0.7) 100%);
-  backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-  position: relative;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.holo-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.1), transparent);
-  transition: 0.5s;
-}
-
-.holo-card:hover::before {
-  left: 100%;
-}
-
-.holo-card:hover {
-  transform: translateY(-5px) scale(1.02);
-  border-color: rgba(34, 211, 238, 0.4); /* Cyan glow on hover */
-  box-shadow: 0 0 25px rgba(34, 211, 238, 0.2);
-}
-
-/* Neon Text */
-.neon-cyan {
-  color: #22D3EE;
-  text-shadow: 0 0 10px rgba(34, 211, 238, 0.7);
-}
-
-.neon-purple {
-  color: #c084fc;
-  text-shadow: 0 0 10px rgba(192, 132, 252, 0.7);
+  h1 { font-size: 1.875rem; line-height: 2.25rem; } /* text-3xl */
+  h2 { font-size: 1.25rem; line-height: 1.75rem; } /* text-xl */
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #02030A;
+  background: hsl(var(--background));
 }
 ::-webkit-scrollbar-thumb {
-  background: #1B1F3B;
+  background: hsl(var(--border));
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155; /* Slate-700 - reduced contrast */
+  background: hsl(var(--muted-foreground));
 }

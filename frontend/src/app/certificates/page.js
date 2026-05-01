@@ -167,7 +167,7 @@ export default function CertificatesPage() {
                                     <Plus className="mr-2 h-5 w-5" /> Add Certificate
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="sm:max-w-[500px] border-border/50 bg-card/95 backdrop-blur-xl">
+                            <DialogContent className="sm:max-w-[500px] border-border/50 bg-card/95 ">
                                 <DialogHeader>
                                     <DialogTitle className="text-xl font-heading">Add New Certificate</DialogTitle>
                                 </DialogHeader>
@@ -256,7 +256,7 @@ export default function CertificatesPage() {
                                             <div className="h-48 w-full bg-muted flex items-center justify-center overflow-hidden border-b border-border/50 group-hover:opacity-90 transition-opacity relative">
                                                 <img src={cert.credentialUrl} alt={cert.title} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                                                    <Badge variant="secondary" className="bg-white/20 backdrop-blur-md text-white border-white/20">{cert.type}</Badge>
+                                                    <Badge variant="secondary" className="bg-white/20  text-white border-border">{cert.type}</Badge>
                                                 </div>
                                             </div>
                                         ) : (

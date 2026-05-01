@@ -65,7 +65,7 @@ export default function RegisterPage() {
                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-900 opacity-90" />
                 
                 <div className="relative z-20 flex items-center text-lg font-medium">
-                    <div className="h-8 w-8 rounded-lg bg-white/10 backdrop-blur mr-3 flex items-center justify-center border border-white/20">
+                    <div className="h-8 w-8 rounded-lg bg-muted backdrop-blur mr-3 flex items-center justify-center border border-border">
                         <span className="text-xl">🚀</span>
                     </div>
                     CareerForge AI
@@ -90,7 +90,7 @@ export default function RegisterPage() {
 
             {/* Right Side - Form */}
             <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative z-10">
-                <div className="w-full max-w-md p-8 rounded-2xl bg-card/40 backdrop-blur-xl border border-white/10 shadow-2xl">
+                <div className="w-full max-w-md p-8 rounded-2xl bg-card/40  border border-border shadow-2xl">
                     <div className="absolute top-4 right-4 md:top-8 md:right-8">
                         <Link
                             href="/auth/login"
@@ -169,7 +169,7 @@ export default function RegisterPage() {
                         </div>
 
                          <div className="grid gap-2">
-                            <Button variant="outline" className="h-11 bg-transparent border-white/10 hover:bg-white/5" type="button" disabled={loading} onClick={() => window.location.href = 'http://localhost:4000/api/auth/github'}>
+                            <Button variant="outline" className="h-11 bg-transparent border-border hover:bg-muted" type="button" disabled={loading} onClick={() => window.location.href = 'http://localhost:4000/api/auth/github'}>
                                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Github className="mr-2 h-4 w-4" />}
                                 GitHub
                             </Button>

@@ -134,25 +134,25 @@ export default function CreateProjectPage() {
     };
 
     return (
-        <DashboardLayout title="Initialize Mission">
+        <DashboardLayout title="Initialize Project">
             <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-700">
-                <NeonButton variant="ghost" onClick={() => router.back()} className="mb-4 pl-0 gap-2 text-slate-400 hover:text-white">
+                <NeonButton variant="ghost" onClick={() => router.back()} className="mb-4 pl-0 gap-2 text-muted-foreground hover:text-white">
                     <ArrowLeft size={16} /> Abort & Return to Log
                 </NeonButton>
 
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-4xl font-heading font-bold tracking-tight text-white uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">New Mission Protocol</h1>
-                        <p className="text-slate-400 mt-2 text-lg">Give idea for implenting project i will give you the guidance of it</p>
+                        <h1 className="text-4xl font-heading font-bold tracking-tight text-white uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">New Project Protocol</h1>
+                        <p className="text-muted-foreground mt-2 text-lg">Give idea for implenting project i will give you the guidance of it</p>
                     </div>
                 </div>
 
                 <Tabs defaultValue="ai" className="w-full">
-                    <TabsList className="grid w-full max-w-md grid-cols-2 mb-8 bg-black/40 p-1 border border-white/10 backdrop-blur-md rounded-xl">
-                        <TabsTrigger value="ai" className="data-[state=active]:bg-plasma-cyan/20 data-[state=active]:text-plasma-cyan font-bold tracking-wide transition-all rounded-lg uppercase text-xs h-9">
+                    <TabsList className="grid w-full max-w-md grid-cols-2 mb-8 bg-black/40 p-1 border border-border  rounded-xl">
+                        <TabsTrigger value="ai" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary font-bold tracking-wide transition-all rounded-lg uppercase text-xs h-9">
                             <Sparkles className="mr-2 h-4 w-4" /> AI Generator
                         </TabsTrigger>
-                        <TabsTrigger value="manual" className="data-[state=active]:bg-white/10 data-[state=active]:text-white font-bold tracking-wide transition-all rounded-lg uppercase text-xs h-9">
+                        <TabsTrigger value="manual" className="data-[state=active]:bg-muted data-[state=active]:text-white font-bold tracking-wide transition-all rounded-lg uppercase text-xs h-9">
                             <Code2 className="mr-2 h-4 w-4" /> Manual Entry
                         </TabsTrigger>
                     </TabsList>
@@ -162,45 +162,45 @@ export default function CreateProjectPage() {
                             {/* Input Section */}
               {/* Header */}
             <div className="flex flex-col items-center text-center space-y-4 mb-12">
-                <Badge variant="outline" className="px-4 py-1 text-sm border-plasma-cyan/30 text-plasma-cyan bg-plasma-cyan/5 tracking-widest uppercase">
+                <Badge variant="outline" className="px-4 py-1 text-sm border-primary/30 text-primary bg-primary/5 tracking-widest uppercase">
                      <BrainCircuit className="w-4 h-4 mr-2" /> Research Engine Active
                 </Badge>
                 <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white uppercase font-heading">
-                    Project <span className="text-transparent bg-clip-text bg-gradient-to-r from-plasma-cyan to-nebula-purple">Architect</span>
+                    Project <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-nebula-purple">Architect</span>
                 </h1>
-                <p className="text-slate-400 max-w-xl text-lg font-light leading-relaxed">
+                <p className="text-muted-foreground max-w-xl text-lg font-light leading-relaxed">
                     Enter a problem statement or rough idea. AI will perform deep research and generate a professional execution roadmap.
                 </p>
             </div>
                             <div className="lg:col-span-2 space-y-6">
-                                <HolographicCard className="rounded-xl p-6 border-l-4 border-l-plasma-cyan">
+                                <HolographicCard className="rounded-xl p-6 border-l-4 border-l-primary">
                                     <div className="mb-6">
                                         <h2 className="text-xl font-bold flex items-center gap-2 text-white font-heading uppercase">
-                                            <Wand2 className="w-5 h-5 text-plasma-cyan" /> Mission Spec
+                                            <Wand2 className="w-5 h-5 text-primary" /> Project Spec
                                         </h2>
-                                        <p className="text-xs text-slate-400 mt-1 font-mono">Define parameters for generation.</p>
+                                        <p className="text-xs text-muted-foreground mt-1 font-mono">Define parameters for generation.</p>
                                     </div>
                                     
                                     <div className="space-y-6">
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Project Idea / Problem Statement</Label>
+                                            <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Project Idea / Problem Statement</Label>
                                             <Textarea 
                                                 placeholder="e.g. A decentralized voting system for local communities using Blockchain..." 
                                                 value={topic}
                                                 onChange={(e) => setTopic(e.target.value)}
-                                                className="bg-black/30 border-white/10 focus:border-plasma-cyan/50 text-white placeholder-slate-600 min-h-[100px] resize-none"
+                                                className="bg-black/30 border-border focus:border-primary/50 text-white placeholder-slate-600 min-h-[100px] resize-none"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Preferred Tech Stack (Optional)</Label>
+                                            <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Preferred Tech Stack (Optional)</Label>
                                             <Input 
                                                 placeholder="e.g. Next.js, Python" value={techStack} onChange={(e) => setTechStack(e.target.value)}
-                                                className="bg-black/30 border-white/10 focus:border-plasma-cyan/50 text-white placeholder-slate-600 h-12"
+                                                className="bg-black/30 border-border focus:border-primary/50 text-white placeholder-slate-600 h-12"
                                             />
                                         </div>
                                         <NeonButton 
                                             variant="primary" 
-                                            className="w-full h-14 text-lg font-bold tracking-widest uppercase shadow-xl shadow-plasma-cyan/20 group"
+                                            className="w-full h-14 text-lg font-bold tracking-widest uppercase shadow-xl shadow-primary/20 group"
                                             onClick={handleGenerate} // Changed back to handleGenerate without argument
                                             disabled={loading || !topic} // Changed back to original disabled condition
                                         >
@@ -220,15 +220,15 @@ export default function CreateProjectPage() {
                                     {generatedProjects.length === 0 && !loading && (
                                         <motion.div 
                                             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                                            className="flex flex-col items-center justify-center h-full min-h-[400px] text-center border-2 border-dashed border-white/5 rounded-xl bg-white/5 p-8"
+                                            className="flex flex-col items-center justify-center h-full min-h-[400px] text-center border-2 border-dashed border-border rounded-xl bg-muted p-8"
                                         >
-                                            <div className="bg-white/5 p-6 rounded-full mb-6 relative">
-                                                <div className="absolute inset-0 bg-plasma-cyan/20 blur-xl rounded-full" />
-                                                <Sparkles className="h-10 w-10 text-plasma-cyan relative z-10" />
+                                            <div className="bg-muted p-6 rounded-full mb-6 relative">
+                                                <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full" />
+                                                <Sparkles className="h-10 w-10 text-primary relative z-10" />
                                             </div>
                                             <h3 className="font-heading font-bold text-xl text-white uppercase tracking-wider">Awaiting Input</h3>
-                                            <p className="text-slate-400 max-w-xs mt-2 leading-relaxed font-mono text-sm">
-                                                Enter mission parameters to generate skill-aligned project roadmaps.
+                                            <p className="text-muted-foreground max-w-xs mt-2 leading-relaxed font-mono text-sm">
+                                                Enter project parameters to generate skill-aligned project roadmaps.
                                             </p>
                                         </motion.div>
                                     )}
@@ -238,15 +238,15 @@ export default function CreateProjectPage() {
                                             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                                             className="flex flex-col items-center justify-center h-full min-h-[400px]"
                                         >
-                                            <Loader2 className="h-16 w-16 animate-spin text-plasma-cyan mb-6" />
+                                            <Loader2 className="h-16 w-16 animate-spin text-primary mb-6" />
                                             <h3 className="text-lg font-bold text-white uppercase tracking-widest animate-pulse">Computing Trajectories...</h3>
-                                            <p className="text-xs text-slate-500 mt-2 font-mono">Analyzing vectors & compiling roadmaps</p>
+                                            <p className="text-xs text-muted-foreground mt-2 font-mono">Analyzing vectors & compiling roadmaps</p>
                                         </motion.div>
                                     )}
 
                                     {generatedProjects.length > 0 && !loading && (
                                         <div className="grid gap-4">
-                                            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">Calculated Trajectories</h3>
+                                            <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest px-1">Calculated Trajectories</h3>
                                     {generatedProjects.map((proj, i) => (
                                                 <motion.div
                                                     key={i}
@@ -255,28 +255,28 @@ export default function CreateProjectPage() {
                                                     transition={{ delay: i * 0.1 }}
                                                 >
                                                     <div 
-                                                        className="glass-panel rounded-xl p-6 hover:bg-white/5 cursor-pointer group relative overflow-hidden transition-all border border-white/5 hover:border-plasma-cyan/30"
+                                                        className="glass-panel rounded-xl p-6 hover:bg-muted cursor-pointer group relative overflow-hidden transition-all border border-border hover:border-primary/30"
                                                         onClick={() => router.push(`/projects/${proj.id}?id=${proj.id}&title=${encodeURIComponent(proj.title)}`)}
                                                     >
-                                                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-plasma-cyan to-nebula-purple opacity-50 group-hover:opacity-100 transition-opacity" />
+                                                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary to-nebula-purple opacity-50 group-hover:opacity-100 transition-opacity" />
                                                         
                                                         <div className="flex justify-between items-start mb-2 pl-4">
-                                                            <h4 className="font-bold text-lg text-white group-hover:text-plasma-cyan transition-colors font-heading tracking-wide uppercase">{proj.title}</h4>
-                                                            <span className="text-[10px] font-bold bg-white/10 px-2 py-1 rounded text-plasma-cyan border border-white/10 uppercase">{proj.difficulty || 'Intermediate'}</span>
+                                                            <h4 className="font-bold text-lg text-white group-hover:text-primary transition-colors font-heading tracking-wide uppercase">{proj.title}</h4>
+                                                            <span className="text-[10px] font-bold bg-muted px-2 py-1 rounded text-primary border border-border uppercase">{proj.difficulty || 'Intermediate'}</span>
                                                         </div>
                                                         
-                                                        <p className="text-sm text-slate-400 line-clamp-3 mb-4 pl-4 font-mono leading-relaxed">
+                                                        <p className="text-sm text-muted-foreground line-clamp-3 mb-4 pl-4 font-mono leading-relaxed">
                                                             {proj.description}
                                                         </p>
                                                         
                                                         <div className="flex items-center justify-between pl-4 mt-4">
                                                              <div className="flex gap-2 flex-wrap">
                                                                 {(Array.isArray(proj.techStack) ? proj.techStack : proj.techStack?.split(',') || []).map((t, k) => (
-                                                                    <span key={k} className="text-[10px] bg-black/30 px-2 py-1 rounded border border-white/10 text-slate-400">{t}</span>
+                                                                    <span key={k} className="text-[10px] bg-black/30 px-2 py-1 rounded border border-border text-muted-foreground">{t}</span>
                                                                 ))}
                                                             </div>
-                                                            <NeonButton variant="ghost" className="text-xs text-plasma-cyan hover:text-white h-auto py-1">
-                                                                Initialize Mission <ArrowRight className="ml-1.5 h-3 w-3" />
+                                                            <NeonButton variant="ghost" className="text-xs text-primary hover:text-white h-auto py-1">
+                                                                Initialize Project <ArrowRight className="ml-1.5 h-3 w-3" />
                                                             </NeonButton>
                                                         </div>
                                                     </div>
@@ -291,25 +291,25 @@ export default function CreateProjectPage() {
 
                     <TabsContent value="manual">
                          <div className="max-w-2xl mx-auto">
-                            <HolographicCard className="p-8 border border-white/10">
+                            <HolographicCard className="p-8 border border-border">
                                 <div className="mb-6">
                                     <h2 className="text-xl font-bold text-white font-heading uppercase">Manual Override</h2>
-                                    <p className="text-sm text-slate-400 font-mono">Manually input mission parameters.</p>
+                                    <p className="text-sm text-muted-foreground font-mono">Manually input project parameters.</p>
                                 </div>
                                 <div className="space-y-6">
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Mission Title</Label>
-                                            <Input value={manualData.title} onChange={e => setManualData({...manualData, title: e.target.value})} className="bg-black/30 border-white/10 text-white" />
+                                            <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Project Title</Label>
+                                            <Input value={manualData.title} onChange={e => setManualData({...manualData, title: e.target.value})} className="bg-black/30 border-border text-white" />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Tech Stack</Label>
-                                            <Input value={manualData.techStack} onChange={e => setManualData({...manualData, techStack: e.target.value})} placeholder="React, Node.js" className="bg-black/30 border-white/10 text-white" />
+                                            <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Tech Stack</Label>
+                                            <Input value={manualData.techStack} onChange={e => setManualData({...manualData, techStack: e.target.value})} placeholder="React, Node.js" className="bg-black/30 border-border text-white" />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Description</Label>
-                                        <Textarea value={manualData.description} onChange={e => setManualData({...manualData, description: e.target.value})} rows={4} className="bg-black/30 border-white/10 text-white resize-none" />
+                                        <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Description</Label>
+                                        <Textarea value={manualData.description} onChange={e => setManualData({...manualData, description: e.target.value})} rows={4} className="bg-black/30 border-border text-white resize-none" />
                                     </div>
                                     <NeonButton className="w-full" onClick={handleSaveManual} disabled={loading || !manualData.title} variant="primary">
                                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Save to Log

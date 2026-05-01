@@ -1,7 +1,6 @@
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import SpaceBackground from "@/components/ui/space-background";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -22,7 +21,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${outfit.variable} antialiased font-sans min-h-screen bg-space-black text-foreground selection:bg-plasma-cyan/30`}
+        className={`${inter.variable} ${outfit.variable} antialiased font-sans min-h-screen bg-background text-foreground`}
       >
         <ThemeProvider
           attribute="class"
@@ -30,7 +29,6 @@ export default function RootLayout({ children }) {
           forcedTheme="dark"
           disableTransitionOnChange
         >
-          <SpaceBackground />
           <div className="relative z-10">
             {children}
           </div>

@@ -51,20 +51,20 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
             {/* Background elements are handled by layout's SpaceBackground, but we can add specific glows here */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-plasma-cyan/10 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
 
-            <HolographicCard className="w-full max-w-md p-8 md:p-10 border-t border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-plasma-cyan to-transparent opacity-50" />
+            <HolographicCard className="w-full max-w-md p-8 md:p-10 border-t border-border shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
                 
                 <div className="mb-8 text-center">
-                    <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-space-black/50 border border-plasma-cyan/30 shadow-[0_0_20px_rgba(34,211,238,0.2)] mb-6 group">
-                        <Sparkles className="h-8 w-8 text-plasma-cyan group-hover:rotate-12 transition-transform" />
+                    <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-space-black/50 border border-primary/30 shadow-[0_0_20px_rgba(34,211,238,0.2)] mb-6 group">
+                        <Sparkles className="h-8 w-8 text-primary group-hover:rotate-12 transition-transform" />
                     </div>
                     <h1 className="text-3xl font-heading font-bold text-white tracking-wide uppercase mb-2">
                         System Access
                     </h1>
-                    <p className="text-slate-400 font-light">
-                        Enter credentials to unlock mission control.
+                    <p className="text-muted-foreground font-light">
+                        Enter credentials to unlock project control.
                     </p>
                 </div>
 
@@ -77,30 +77,30 @@ export default function LoginPage() {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-xs font-mono uppercase tracking-widest text-slate-500 ml-1">Identity // Email</label>
+                        <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground ml-1">Identity // Email</label>
                         <div className="relative group">
-                            <Mail className="absolute left-3 top-3.5 h-5 w-5 text-slate-500 group-focus-within:text-plasma-cyan transition-colors" />
+                            <Mail className="absolute left-3 top-3.5 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                             <input 
                                 type="email" 
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full bg-black/20 border border-white/10 rounded-xl px-10 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-plasma-cyan/50 focus:ring-1 focus:ring-plasma-cyan/50 transition-all font-sans"
+                                className="w-full bg-black/20 border border-border rounded-xl px-10 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-sans"
                                 placeholder="pilot@careerforge.ai"
                             />
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                         <label className="text-xs font-mono uppercase tracking-widest text-slate-500 ml-1">Security Key // Password</label>
+                         <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground ml-1">Security Key // Password</label>
                          <div className="relative group">
-                            <KeyRound className="absolute left-3 top-3.5 h-5 w-5 text-slate-500 group-focus-within:text-plasma-cyan transition-colors" />
+                            <KeyRound className="absolute left-3 top-3.5 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                             <input 
                                 type="password" 
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-black/20 border border-white/10 rounded-xl px-10 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-plasma-cyan/50 focus:ring-1 focus:ring-plasma-cyan/50 transition-all font-sans"
+                                className="w-full bg-black/20 border border-border rounded-xl px-10 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-sans"
                                 placeholder="••••••••••••"
                             />
                         </div>
@@ -125,9 +125,9 @@ export default function LoginPage() {
                 </form>
                 
                 <div className="mt-8 text-center">
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-muted-foreground">
                         Top clearance? 
-                        <Link href="/auth/register" className="text-plasma-cyan hover:text-white ml-2 transition-colors font-bold tracking-wide uppercase text-xs">
+                        <Link href="/auth/register" className="text-primary hover:text-white ml-2 transition-colors font-bold tracking-wide uppercase text-xs">
                             Initialize Account
                         </Link>
                     </p>

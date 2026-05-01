@@ -183,7 +183,7 @@ export default function ProjectWorkspace({ params }) {
 
     const TaskCard = ({ task, index, color }) => (
         <div 
-            className="group relative glass-card p-4 rounded-xl cursor-pointer hover:border-primary/40 transition-all hover:shadow-md mb-3 overflow-hidden border border-border/40 bg-card/60 backdrop-blur-sm" 
+            className="group relative glass-card p-4 rounded-xl cursor-pointer hover:border-primary/40 transition-all hover:shadow-md mb-3 overflow-hidden border border-border/40 bg-card/60 " 
             onClick={() => {
                 if (task.status === 'TODO') moveTask(index, 'IN_PROGRESS');
                 if (task.status === 'IN_PROGRESS') moveTask(index, 'DONE');
@@ -248,7 +248,7 @@ export default function ProjectWorkspace({ params }) {
                         <Loader2 className="w-8 h-8 animate-spin text-primary" />
                     </div>
                 ) : (
-                    <div className="flex flex-col lg:flex-row justify-between gap-8 bg-card/40 backdrop-blur-sm p-6 rounded-2xl border border-border/50">
+                    <div className="flex flex-col lg:flex-row justify-between gap-8 bg-card/40  p-6 rounded-2xl border border-border/50">
                         <div className="space-y-4 max-w-3xl">
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">

@@ -43,7 +43,7 @@ export function DashboardLayout({ children, title = "Dashboard" }) {
             <Sidebar />
 
             <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
-                <header className="h-20 border-b border-white/5 bg-black/20 backdrop-blur-xl flex items-center justify-between px-8 z-10">
+                <header className="h-20 border-b border-border bg-black/20  flex items-center justify-between px-8 z-10">
                     <div className="flex items-center gap-4">
                         <h2 className="text-2xl font-bold tracking-tight text-foreground font-heading">{title}</h2>
                     </div>

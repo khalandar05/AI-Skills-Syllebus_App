@@ -1,52 +1,40 @@
-const OpenAI = require("openai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 class AiService {
     constructor() {
-        this.apiKey = process.env.OPENROUTER_API_KEY;
-        this.baseURL = process.env.OPENROUTER_BASE_URL || "https://openrouter.ai/api/v1";
-        this.model = process.env.AI_MODEL_NAME || "meta-llama/llama-3-70b-instruct";
+        this.apiKey = process.env.GEMINI_API_KEY;
+        this.modelName = process.env.AI_MODEL_NAME || "gemini-1.5-flash";
 
         if (!this.apiKey) {
-            console.error("❌ CRITICAL: OPENROUTER_API_KEY is missing!");
+            console.error("⚠️ WARNING: GEMINI_API_KEY is missing! AI features will fail gracefully.");
+            this.genAI = null;
         } else {
-            this.openai = new OpenAI({
-                apiKey: this.apiKey,
-                baseURL: this.baseURL,
-                defaultHeaders: {
-                    "HTTP-Referer": "https://antigravity-app.com", // Optional, for OpenRouter rankings
-                    "X-Title": "AntiGravity Portfolio"
-                }
-            });
-            console.log(`✅ AI Service Initialized with Model: ${this.model}`);
+            this.genAI = new GoogleGenerativeAI(this.apiKey);
+            console.log(`✅ AI Service Initialized with Model: ${this.modelName}`);
         }
     }
 
     async generateJson(prompt, systemInstruction) {
-        if (!this.openai) throw new Error("AI Service not initialized");
+        if (!this.genAI) throw new Error("AI Service not initialized (Missing API Key)");
 
         try {
-            const completion = await this.openai.chat.completions.create({
-                model: this.model,
-                messages: [
-                    { role: "system", content: systemInstruction + " RETURN JSON ONLY." },
-                    { role: "user", content: prompt }
-                ],
-                response_format: { type: "json_object" }
+            const model = this.genAI.getGenerativeModel({
+                model: this.modelName,
+                systemInstruction: systemInstruction + " RETURN JSON ONLY.",
+                generationConfig: {
+                    responseMimeType: "application/json",
+                }
             });
 
-            const content = completion.choices[0].message.content;
-            console.log("[DEBUG] AI Raw Content (truncated):", content.substring(0, 200));
-            return JSON.parse(content);
+            const result = await model.generateContent(prompt);
+            const response = result.response;
+            const text = response.text();
+            
+            console.log("[DEBUG] AI Raw Content (truncated):", text.substring(0, 200));
+            return JSON.parse(text);
         } catch (error) {
             console.error("AI Generation Error:", error);
-            // Fallback for simple JSON parsing if the model is chatty
-            try {
-                const text = error.response?.data?.error?.message || error.message; 
-                 // Naive fallback if we had access to the raw text, but mostly we just throw
-                throw new Error("Failed to generate JSON from AI.");
-            } catch (e) {
-                throw error;
-            }
+            throw new Error("Failed to generate JSON from AI.");
         }
     }
 
@@ -66,16 +54,20 @@ class AiService {
 
         try {
             const res = await this.generateJson(prompt, "You are an expert Resume Writer for Software Engineers.");
-            return res.bullets;
+            return res.bullets || this.getFallbackBullets(projectTitle, techStack);
         } catch (e) {
             console.warn("AI Resume Gen failed, returning fallback.");
-            return [
-                `Developed ${projectTitle} using ${techStack}, focusing on scalable architecture.`,
-                `Implemented core features to solve key user problems efficiently.`,
-                `Optimized application performance and ensured code maintainability.`,
-                `Collaborated on full-stack development using best practices.`
-            ];
+            return this.getFallbackBullets(projectTitle, techStack);
         }
+    }
+
+    getFallbackBullets(projectTitle, techStack) {
+        return [
+            `Developed ${projectTitle} using ${techStack}, focusing on scalable architecture.`,
+            `Implemented core features to solve key user problems efficiently.`,
+            `Optimized application performance and ensured code maintainability.`,
+            `Collaborated on full-stack development using best practices.`
+        ];
     }
 
     async generateInterviewQuestions(topic, difficulty = "Medium", type = "Technical") {
@@ -159,14 +151,18 @@ class AiService {
             console.error("Parallel Generation Error:", e);
             // Try single batch fallback of 25 if parallel fails
             const fallbackPrompt = `Generate 25 mostly asked ${type} interview questions. Topic: "${topic}". Difficulty: ${difficulty}. Output JSON: { "questions": [...] }`;
-            const fallbackRes = await this.generateJson(fallbackPrompt, "You are a Senior Interviewer.");
-             // Ensure consistent format
-             const fallbackQuestions = (fallbackRes.questions || []).map((q, i) => ({
-                id: i + 1,
-                question: typeof q === 'object' ? q.question : q,
-                type: type
-            }));
-            return { questions: fallbackQuestions };
+            try {
+                const fallbackRes = await this.generateJson(fallbackPrompt, "You are a Senior Interviewer.");
+                const fallbackQuestions = (fallbackRes.questions || []).map((q, i) => ({
+                    id: i + 1,
+                    question: typeof q === 'object' ? q.question : q,
+                    type: type
+                }));
+                return { questions: fallbackQuestions };
+            } catch (fallbackErr) {
+                console.error("Fallback generation failed:", fallbackErr);
+                return { questions: [] };
+            }
         }
     }
 
@@ -177,7 +173,7 @@ class AiService {
         
         Output JSON:
         {
-            "score": 0-10 (Integer),
+            "score": 0-10,
             "feedback": "Constructive feedback...",
             "improvements": ["Tip 1", "Tip 2"]
         }`;
@@ -189,7 +185,6 @@ class AiService {
         const prompt = `Provide a clear, educational explanation for this interview question and a model answer.
         Question: "${question}"
         
-        Output JSON:
         Output JSON:
         {
             "explanation": "Brief explanation of the concept...",
@@ -210,12 +205,11 @@ class AiService {
         
         try {
              const res = await this.generateJson(prompt, "Personal Branding Expert.");
-             return res.enhancedBio;
+             return res.enhancedBio || currentBio;
         } catch (e) {
             return currentBio;
         }
     }
-
 
     async generateProjectIdeas(topic, techStack = []) {
         const prompt = `Generate 3 professional software engineering project ideas based on the topic: "${topic}".
@@ -267,6 +261,7 @@ class AiService {
          
          return await this.generateJson(prompt, "You are a Tech Career Expert.");
     }
+    
     async generatePortfolioContent(userContext) {
         const prompt = `Generate professional portfolio content for a software engineer.
         
@@ -292,6 +287,7 @@ class AiService {
 
         return await this.generateJson(prompt, "You are a sort-after Tech Recruiter and Resume Expert.");
     }
+    
     async generateResearchRoadmap(idea) {
         const prompt = `Act as a Senior Principal Engineer and Research Architect.
         
@@ -317,8 +313,7 @@ class AiService {
                     "description": "Initialize repo, setup shadcn/ui, configure database schema...",
                     "resources": ["Official Next.js Docs", "Supabase Auth Helpers Guide"],
                     "estimatedTime": "2 Days"
-                },
-                // ... Generate 6-10 detailed phases
+                }
             ],
             "repoStats": {
                 "problemStatement": "Clear definition of the problem being solved...",

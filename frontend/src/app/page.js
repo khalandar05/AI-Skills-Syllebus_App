@@ -4,8 +4,6 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Sparkles, Zap, Brain, Rocket, Code2, Cpu, BookOpen, Target, FileText, Play } from "lucide-react";
-import SceneCanvas from "@/components/ui/SceneCanvas";
-import HeroScene from "@/components/landing/HeroScene";
 import { NeonButton } from "@/components/ui/neon-button";
 
 // Pre-defined animation variants
@@ -35,20 +33,14 @@ export default function LandingPage() {
 
   return (
     <main className="relative min-h-screen bg-neutral-950 text-white overflow-x-hidden selection:bg-violet-500/30">
-      {/* 3D Background Layer - Fixed */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <SceneCanvas className="w-full h-full">
-          <HeroScene />
-        </SceneCanvas>
-        {/* Overlay gradient for text readability - CRITICAL for user request */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/30 via-[#0A0A0A]/60 to-[#0A0A0A] z-[1]" />
-      </div>
+      {/* Solid Background Layer */}
+      <div className="fixed inset-0 z-0 bg-background pointer-events-none" />
 
       {/* Content Layer */}
       <div className="relative z-10">
         
         {/* Navigation */}
-        <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#0A0A0A]/80 backdrop-blur-xl">
+        <nav className="fixed top-0 w-full z-50 border-b border-border bg-[#0A0A0A]/80 ">
           <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center text-white font-bold shadow-lg shadow-violet-500/20">
@@ -85,7 +77,7 @@ export default function LandingPage() {
               initial="hidden"
               animate="visible"
               variants={fadeUp}
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-500/30 bg-violet-500/10 backdrop-blur-md mb-8"
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-500/30 bg-violet-500/10  mb-8"
             >
               <Sparkles className="w-4 h-4 text-violet-400" />
               <span className="text-xs font-semibold text-violet-300 uppercase tracking-wider">AI-Powered Learning Revolution</span>
@@ -131,7 +123,7 @@ export default function LandingPage() {
                 </NeonButton>
               </Link>
               
-              <button className="h-14 px-8 rounded-full border border-white/10 bg-white/5 text-white font-medium hover:bg-white/10 transition-all flex items-center gap-2 min-w-[200px] justify-center backdrop-blur-sm">
+              <button className="h-14 px-8 rounded-full border border-border bg-muted text-white font-medium hover:bg-muted transition-all flex items-center gap-2 min-w-[200px] justify-center ">
                 <Play className="w-5 h-5 fill-current" /> Watch Demo
               </button>
             </motion.div>
@@ -199,11 +191,11 @@ function FeatureCard({ icon, title, description, delay }) {
   return (
     <motion.div 
       variants={fadeUp}
-      className="group p-8 rounded-3xl border border-white/5 bg-white/[0.03] backdrop-blur-sm hover:bg-white/[0.08] transition-all duration-300 hover:-translate-y-2 relative overflow-hidden"
+      className="group p-8 rounded-3xl border border-border bg-white/[0.03]  hover:bg-white/[0.08] transition-all duration-300 hover:-translate-y-2 relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       
-      <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-6 border border-white/5 shadow-inner relative z-10 group-hover:scale-110 transition-transform duration-300">
+      <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mb-6 border border-border shadow-inner relative z-10 group-hover:scale-110 transition-transform duration-300">
         {icon}
       </div>
       <h3 className="text-2xl font-bold mb-4 text-white relative z-10">{title}</h3>
@@ -216,8 +208,8 @@ function FeatureCard({ icon, title, description, delay }) {
 
 function GlassCard({ icon, title, subtitle }) {
   return (
-    <div className="flex items-center gap-4 p-4 pr-8 rounded-2xl border border-white/10 bg-neutral-900/40 backdrop-blur-xl shadow-2xl">
-      <div className="w-12 h-12 rounded-xl bg-neutral-800 flex items-center justify-center border border-white/5">
+    <div className="flex items-center gap-4 p-4 pr-8 rounded-2xl border border-border bg-neutral-900/40  shadow-2xl">
+      <div className="w-12 h-12 rounded-xl bg-neutral-800 flex items-center justify-center border border-border">
         {icon}
       </div>
       <div className="text-left">

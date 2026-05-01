@@ -34,6 +34,8 @@ model User {
   linkedinTokenExpiry  BigInt? // Expiry timestamp
 
   linkedinPosts LinkedinPost[]
+
+  @@index([email])
 }
 
 model LinkedinPost {
@@ -44,6 +46,8 @@ model LinkedinPost {
   linkedinPostId String?
 
   publishedAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model CustomSection {
@@ -54,6 +58,8 @@ model CustomSection {
   content   String // Text content or bullets
   isVisible Boolean  @default(true)
   createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 // For OAuth tokens (GitHub, etc.)
@@ -68,6 +74,7 @@ model Account {
   expiresAt         Int?
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Portfolio {
@@ -119,6 +126,9 @@ model UserProject {
 
   completedAt DateTime?
   updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([projectId])
 }
 
 model Certificate {
@@ -136,6 +146,8 @@ model Certificate {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model Resume {
@@ -145,6 +157,8 @@ model Resume {
   title     String // e.g. "Frontend Resume"
   content   String // Generated Bullet points or full content
   createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model InterviewSession {
@@ -159,6 +173,8 @@ model InterviewSession {
   score     Int?
 
   createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Syllabus {
@@ -172,6 +188,8 @@ model Syllabus {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model SyllabusUnit {
@@ -183,6 +201,8 @@ model SyllabusUnit {
   title      String?
 
   topics SyllabusTopic[]
+
+  @@index([syllabusId])
 }
 
 model SyllabusTopic {
@@ -193,4 +213,6 @@ model SyllabusTopic {
   title       String
   description String?
   skills      String? // Extracted skills
+
+  @@index([unitId])
 }
